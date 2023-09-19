@@ -1,4 +1,9 @@
-### structure
+#!/bin/python
+'''
+    Author  :   wkjee
+    Title   :   OutputParser
+
+    Layout
 
     /root
         /Base
@@ -10,4 +15,20 @@
 		  *	FHIaims.py	: FHIaims_Patterns, ExtractFHIaims
 
     19.09.2023  : framework
+'''
 
+class FHIaims_Patterns(object):
+
+	def __init__(self):
+
+		pass
+
+class ExtractFHIaims(object):
+
+	def __init__(self):
+
+		pass
+
+if __name__=='__main__':
+
+	pass
