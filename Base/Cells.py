@@ -44,6 +44,9 @@ class Cell(object):
 	def set_langles(self,langles):
 		self.langles = langles
 
+	def set_volume(self):
+		self.volume = np.abs(np.dot(np.array(self.lvectors[0]),np.cross(np.array(self.lvectors[1]),np.array(self.lvectors[2]))))
+
 	def set_lattice(self,lvectors=None,lconstants=None,langles=None):
 
 		#
@@ -56,6 +59,7 @@ class Cell(object):
 		if lvectors is not None and (lconstants is None and langles is None):
 
 			self.set_lvectors(lvectors)
+			self.set_volume()
 
 			self.lconstants[0] = np.linalg.norm(np.array(self.lvectors[0]))
 			self.lconstants[1] = np.linalg.norm(np.array(self.lvectors[1]))
@@ -79,6 +83,7 @@ class Cell(object):
 				  lconstants[2]*np.sqrt(1.-np.power(np.cos(np.deg2rad(langles[1])),2.)-np.power((np.cos(np.deg2rad(langles[0]))-np.cos(np.deg2rad(langles[1]))*np.cos(np.deg2rad(langles[2])))/np.sin(np.deg2rad(langles[2])),2.))]
 		
 			self.lvectors = [a,b,c]
+			self.set_volume()
 
 	def add_atom(self,atom,frac=None):
 		self.atom_list.append(atom)
@@ -306,3 +311,4 @@ if __name__ == "__main__":
 	cell3.write_config_fhiaims(name='1.config.fhiaims',rule='cart')
 	cell3.write_config_fhiaims(name='2.config.fhiaims',rule='frac')
 
+	print(cell3.volume)
