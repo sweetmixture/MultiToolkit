@@ -20,6 +20,8 @@
 import os
 import numpy as np
 
+from Base.Cells import Cell
+
 class GULP_Patterns(object):
 
 	def __init__(self):
@@ -37,17 +39,17 @@ class GULP_Patterns(object):
 			'IrAtomsShells' : { 'space' : 0, 'next' : 0, 'loc' : 6, 'pattern' : 'Number of irreducible atoms/shells =' },
 			'AtomsShells'   : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Total number atoms/shells =' },
 			'Dimension'     : { 'space' : 0, 'next' : 0, 'loc' : 3, 'pattern' : 'Dimensionality =' },
-			'LattVectors'   : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Cartesian lattice vectors (Angstroms) :' },		# Req special format reading
-			'LattParams'    : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Cell parameters (Angstroms/Degrees):' },			# Req special format reading
+			'LattVectors'   : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Cartesian lattice vectors (Angstroms) :' },
+			'LattParams'    : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Cell parameters (Angstroms/Degrees):' },
 			'LattVol'       : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Initial cell volume =' },
 		}
 
 		self.OutputConfig = {
 			'From'          : { 'space' : 0, 'next' : 0, 'loc' : 0, 'pattern' : 'Output for configuration' },
-			'InitEnergy'    : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Total lattice energy' },										# only the first one must be used -> second pattern is for kJ/mol
+			'InitEnergy'    : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Total lattice energy' },										
 			'FinalEnergy'   : { 'space' : 0, 'next' : 0, 'loc' : 4, 'pattern' : 'Final energy =' },
 			'FinalGnorm'    : { 'space' : 0, 'next' : 0, 'loc' : 4, 'pattern' : 'Final Gnorm  =' },
-			'FinalFrac'     : { 'space' : 5, 'next' : 0, 'loc' : 0, 'pattern' : 'Final fractional coordinates of atoms :' },					# after 'space' : lines start reading ... x y z
+			'FinalFrac'     : { 'space' : 5, 'next' : 0, 'loc' : 0, 'pattern' : 'Final fractional coordinates of atoms :' },
 			'LattVectors'   : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Final Cartesian lattice vectors (Angstroms) :' },
 			'LattParams'    : { 'space' : 2, 'next' : 6, 'loc' : 0, 'pattern' : 'Final cell parameters and derivatives :' },
 			'LattVol'       : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Non-primitive cell volume =' },
@@ -63,8 +65,8 @@ class GULP_Patterns(object):
 			'ShearMod'      : { 'space' : 0, 'next' : 0, 'loc' : 0, 'pattern' : 'Shear Modulus (GPa)     =' },
 			'Compress'      : { 'space' : 0, 'next' : 0, 'loc' : 4, 'pattern' : 'Compressibility (1/GPa) =' },
 			'YoungsMod'     : { 'space' : 0, 'next' : 0, 'loc' : 0, 'pattern' : 'Youngs Moduli (GPa)     =' },
-			'StaticDielec' : { 'space' : 4, 'next' : 3, 'loc' : 0, 'pattern' : 'Static dielectric constant tensor :' },
-			'HighDielec'   : { 'space' : 4, 'next' : 3, 'loc' : 0, 'pattern' : 'High frequency dielectric constant tensor :' },
+			'StaticDielec'  : { 'space' : 4, 'next' : 3, 'loc' : 0, 'pattern' : 'Static dielectric constant tensor :' },
+			'HighDielec'    : { 'space' : 4, 'next' : 3, 'loc' : 0, 'pattern' : 'High frequency dielectric constant tensor :' },
 		}
 
 class ExtractGULP(GULP_Patterns):
@@ -360,13 +362,38 @@ class ExtractGULP(GULP_Patterns):
 			next(iterator)
 			next(iterator)
 
-			dielec.append(next(iterator).split()[1:])	
-			dielec.append(next(iterator).split()[1:])	
-			dielec.append(next(iterator).split()[1:])	
+			#dielec.append(next(iterator).split()[1:])	
+			#dielec.append(next(iterator).split()[1:])	
+			#dielec.append(next(iterator).split()[1:])	
+
+			l1 = next(iterator).strip()
+			dx = []
+			dx.append(l1[1:13].strip())
+			dx.append(l1[13:23].strip())
+			dx.append(l1[23:].strip())
+			l1 = next(iterator).strip()
+			dy = []
+			dy.append(l1[1:13].strip())
+			dy.append(l1[13:23].strip())
+			dy.append(l1[23:].strip())
+			l1 = next(iterator).strip()
+			dz = []
+			dz.append(l1[1:13].strip())
+			dz.append(l1[13:23].strip())
+			dz.append(l1[23:].strip())
+		
+			dielec.append(dx)
+			dielec.append(dy)
+			dielec.append(dz)
 
 			for i in range(3):
 				for j in range(3):
-					dielec[i][j] = float(dielec[i][j])
+					try:
+						dielec[i][j] = float(dielec[i][j])
+					except ValueError:
+						dielec[i][j] = 'NaN'
+						self.output_file_ptr.seek(0)
+						return False, None
 
 			self.output_file_ptr.seek(0)
 
@@ -400,13 +427,38 @@ class ExtractGULP(GULP_Patterns):
 			next(iterator)
 			next(iterator)
 
-			dielec.append(next(iterator).split()[1:])	
-			dielec.append(next(iterator).split()[1:])	
-			dielec.append(next(iterator).split()[1:])	
+			#dielec.append(next(iterator).split()[1:])	
+			#dielec.append(next(iterator).split()[1:])	
+			#dielec.append(next(iterator).split()[1:])	
+
+			l1 = next(iterator).strip()
+			dx = []
+			dx.append(l1[1:13].strip())
+			dx.append(l1[13:23].strip())
+			dx.append(l1[23:].strip())
+			l1 = next(iterator).strip()
+			dy = []
+			dy.append(l1[1:13].strip())
+			dy.append(l1[13:23].strip())
+			dy.append(l1[23:].strip())
+			l1 = next(iterator).strip()
+			dz = []
+			dz.append(l1[1:13].strip())
+			dz.append(l1[13:23].strip())
+			dz.append(l1[23:].strip())
+		
+			dielec.append(dx)
+			dielec.append(dy)
+			dielec.append(dz)
 
 			for i in range(3):
 				for j in range(3):
-					dielec[i][j] = float(dielec[i][j])
+					try:
+						dielec[i][j] = float(dielec[i][j])
+					except ValueError:
+						dielec[i][j] = 'NaN'
+						self.output_file_ptr.seek(0)
+						return False, None
 
 			self.output_file_ptr.seek(0)
 
@@ -435,6 +487,7 @@ if __name__ == '__main__':
 	if fcheck:
 		# checklist
 		print('finish       :',gex.check_finish_normal())
+
 		print('final energy :',gex.get_final_energy())
 		print('final gnorm  :',gex.get_final_gnorm(gnorm_tol=1.E-6))
 		#print('final gnorm  :',gex.get_final_gnorm())
@@ -462,6 +515,7 @@ if __name__ == '__main__':
 	if fcheck:
 		# checklist
 		print('finish       :',gex.check_finish_normal())
+
 		print('final energy :',gex.get_final_energy())
 		print('final gnorm  :',gex.get_final_gnorm(gnorm_tol=1.E-6))
 		#print('final gnorm  :',gex.get_final_gnorm())
@@ -487,8 +541,7 @@ if __name__ == '__main__':
 	#print(gex.check_finish_normal())
 	#print(gex.check_gnorm_normal(gnorm_tol=1.E-6))
 
-
-
+	cell = Cell()
 	#print(gp.InputConfig['IrAtomsShells']['loc'])
 	#print(gp.InputConfig['IrAtomsShells']['pattern'])
 
