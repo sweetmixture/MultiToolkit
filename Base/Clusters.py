@@ -42,7 +42,7 @@ class Cluster(object):
 		if cart2 is not None:
 			atom = Shell()
 			atom.set_atom0d(element,cart,cart2)
-			self.atom_list.appen(atom)
+			self.atom_list.append(atom)
 
 	def set_atom_list(self,atom_list):
 		

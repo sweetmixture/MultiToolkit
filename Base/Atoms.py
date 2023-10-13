@@ -12,16 +12,17 @@
 			Cells.py	: Cell
 
 	18.09.2023	: framework
+	13.10.2023  : exceptions, print* dumped
 '''
 import numpy as np
 import sys
 
 class Atom(object):
 
-	def __init__(self,element=None):
+	def __init__(self,):
 
 		# element name : e.g., C, N, O ...
-		self.element = element
+		self.element = None
 
 		self.cart = [ None for i in range(3) ]		# Cartesian
 		self.frac = [ None for i in range(3) ]		# Fractional
@@ -38,8 +39,7 @@ class Atom(object):
 		if len(cart) == 3:
 			for i in range(3):
 				try:
-					cart[i] = float(cart[i])
-					self.cart[i] = cart[i]
+					self.cart[i] = float(cart[i])
 				except:
 					print(f'Err casting float() cart failed',file=sys.stderr)
 					print(f'Err src : {__file__}',file=sys.stderr)
@@ -53,8 +53,7 @@ class Atom(object):
 		if len(frac) == 3:
 			for i in range(3):
 				try:
-					frac[i] = float(frac[i])
-					self.frac[i] = frac[i]
+					self.frac[i] = float(frac[i])
 				except:
 					print(f'Err casting float() frac faield',file=sys.stderr)
 					print(f'Err src : {__file__}',file=sys.stderr)
@@ -71,13 +70,11 @@ class Atom(object):
 			for i in range(3):
 				for j in range(3):
 					try:
-						lvectors[i][j] = float(lvectors[i][j])
+						self.lvectors[i][j] = float(lvectors[i][j])
 					except:
 						print(f'Err casting float() lvectors failed',file=sys.stderr)
 						print(f'Err src : {__file__}',file=sys.stderr)
 						sys.exit()
-
-			self.lvectors = lvectors
 		else:
 			print(f'Err lvector dimension is not 3 x 3',file=sys.stderr)
 			print(f'Err src : {__file__}',file=sys.stderr)
@@ -158,15 +155,15 @@ class Atom(object):
 		elif mode == 'frac_gulp':
 			print("%4s%6s%14.8f%14.8f%14.8f" % (self.element,'core',self.frac[0],self.frac[1],self.frac[2]))
 		elif mode == 'cart_fhiaims':
-			print("%4s%14.8f%14.8f%14.8f%4s" % ('atom',self.cart[0],self.cart[1],self.cart[2],self.element))
+			print("%4s%20.8f%14.8f%14.8f%4s" % ('atom',self.cart[0],self.cart[1],self.cart[2],self.element))
 		elif mode == 'frac_fhiaims':
-			print("%4s%14.8f%14.8f%14.8f%4s" % ('atom',self.frac[0],self.frac[1],self.frac[2],self.element))
+			print("%4s%15.8f%14.8f%14.8f%4s" % ('atom_frac',self.frac[0],self.frac[1],self.frac[2],self.element))
 		else:
 			print(f'Err print_atom() mode is not set : possible modes : xyz, cart_gulp, frac_gulp, cart_fhiaims, frac_fhiaims',file=sys.stderr)
 			print(f'Err src: {__file__}',file=sys.stderr)
 			sys.exit()
 
-	# ------- deprecated 
+	# ------- deprecated 13.10.23 ~
 	def print_xyz(self):
 		print("%4s%14.8f%14.8f%14.8f" % (self.element,self.cart[0],self.cart[1],self.cart[2]))
 
@@ -193,9 +190,9 @@ class Atom(object):
 
 class Shell(Atom):
 
-	def __init__(self,element=None):
+	def __init__(self,):
 
-		super().__init__(element)
+		super().__init__()	# self.element, self.lvectors
 	
 		self.cart_shel = [ None for i in range(3) ]      # Shell cartesian
 		self.frac_shel = [ None for i in range(3) ]      # Shell fractional
@@ -204,10 +201,32 @@ class Shell(Atom):
 		basic setters
 	'''
 	def set_cart_shel(self,cart):        # cart -> list(3) : <float> * 3
-		self.cart_shel = [ float(cart[0]), float(cart[1]), float(cart[2]) ]
+		if len(cart) == 3:
+			for i in range(3):
+				try:
+					self.cart_shel[i] = float(cart[i])
+				except:
+					print(f'Err castig float() cart_shel failed',file=sys.stderr)
+					print(f'Err src : {__file__}',file=sys.stderr)
+					sys.exit()
+		else:
+			print(f'Err cart_shel dimension is not 3',file=sys.stderr)
+			print(f'Err src : {__file__}',file=sys.stderr)
+			sys.exit()
 
 	def set_frac_shel(self,frac):        # frac -> list(3) : <float> * 3
-		self.frac_shel = [ float(frac[0]), float(frac[1]), float(frac[2]) ]
+		if len(frac) == 3:
+			for i in range(3):
+				try:
+					self.frac_shel[i] = float(frac[i])
+				except:
+					print(f'Err castig float() frac_shel failed',file=sys.stderr)
+					print(f'Err src : {__file__}',file=sys.stderr)
+					sys.exit()
+		else:
+			print(f'Err frac_shel dimension is not 3',file=sys.stderr)
+			print(f'Err src : {__file__}',file=sys.stderr)
+			sys.exit()
 
 	'''
     	internal uses
@@ -216,6 +235,12 @@ class Shell(Atom):
 		np_lv   = np.array(self.lvectors)
 		np_frac = np.array(self.frac_shel)
 		self.cart_shel = np.dot(np_lv.T,np_frac).tolist()
+	
+	def cart2frac_shel(self):
+		np_cart = np.array(self.cart_shel)
+		np_lvT = np.array(self.lvectors).T
+		np_lvT_inv = np.linalg.inv(np_lvT)
+		self.frac_shel = np.dot(np_lvT_inv,np_cart).tolist()
 
 	'''
 		derived setters
@@ -235,20 +260,81 @@ class Shell(Atom):
 			self.set_frac_shel(frac_shel)
 		self.frac2cart_shel()		# using lvectors + frac -> calculate cart
 
+	def set_atom3d(self,element,lvectors,cd,cd_shel=None,mode='frac'):
+		super().set_atom3d(element,lvectors,cd,mode=mode)
+		if cd_shel == None:
+			if mode == 'frac':
+				self.set_frac_shel(cd)
+				self.frac2cart_shel()
+			elif mode == 'cart':
+				self.set_cart_shel(cd)
+				self.cart2frac_shel()
+			else:
+				print(f"Err input mode must be either 'frac' or 'cart'",file=sys.stderr)
+				print(f'Err src : {__file__}',file=sys.stderr)
+				sys.exit()
+		else:
+			if mode == 'frac':
+				self.set_frac_shel(cd_shel)
+				sefl.frac2cart_shel()
+			elif mode == 'cart':
+				self.set_cart_shel(cd_shel)
+				self.cart2frac_shel()
+			else:
+				print(f"Err input mode must be either 'frac' or 'cart'",file=sys.stderr)
+				print(f'Err src : {__file__}',file=sys.stderr)
+				sys.exit()
 	'''
 		getters (including returns)
 	'''
+	def get_element(self):
+		return super().get_element()
+
+	# overriding
+	def get_cart(self):
+		return super().get_cart()
+
+	# overriding
+	def get_frac(self):
+		return super().get_frac()
+
 	def get_cart_shel(self):
 		return self.cart_shel
 
 	def get_frac_shel(self):
 		return self.frac_shel
 
+	# overriding
 	def get_attr_gulp(self):
 		return 'shel'
+
 	'''
 		print messages
 	'''
+
+	# overriding
+	def print_atom(self,shel=True,mode=None):
+
+		super().print_atom(mode=mode)
+
+		if shel is True:
+
+			if mode == 'xyz':
+				print("%4s%14.8f%14.8f%14.8f\t# GULP 'shel'" % (self.element,self.cart_shel[0],self.cart_shel[1],self.cart_shel[2]))
+			elif mode == 'cart_gulp':
+				print("%4s%6s%14.8f%14.8f%14.8f" % (self.element,'shel',self.cart_shel[0],self.cart_shel[1],self.cart_shel[2]))
+			elif mode == 'frac_gulp':
+				print("%4s%6s%14.8f%14.8f%14.8f" % (self.element,'shel',self.frac_shel[0],self.frac_shel[1],self.frac_shel[2]))
+			elif mode == 'frac_fhiaims':
+				pass
+			elif mode == 'cart_fhiaims':
+				pass
+			else:
+				print(f'Err print_atom() mode is not set : possible modes : xyz, cart_gulp, frac_gulp',file=sys.stderr)
+				print(f'Err src: {__file__}',file=sys.stderr)
+				sys.exit()
+
+	# ------- deprecated 
 	def print_cart_gulp(self,show_shel=True):
 
 		super().print_cart_gulp()
@@ -298,6 +384,27 @@ if __name__ == "__main__":
 
 	print(" --")
 	
+	shel = Shell()
+	# set_atom3d(self,element,lvectors,cd,cd_shel=None,mode='frac'):
+	shel.set_atom3d('Mg',[[4,0,0],[0,4,0],[0,0,5]],['2','2','2'],['2.5','2','2'],mode='cart')
+	print(shel.get_element())
+	print(shel.get_cart())
+	print(shel.get_cart_shel())
+	print(shel.get_frac())
+	print(shel.get_frac_shel())
+	print(shel.get_attr_gulp())
+
+	shel.print_atom(mode='xyz')
+	shel.print_atom(mode='cart_gulp')
+	shel.print_atom(mode='frac_gulp')
+	print(" test2")
+	shel.print_atom(shel=False,mode='xyz')
+	shel.print_atom(shel=False,mode='cart_gulp')
+	shel.print_atom(shel=False,mode='frac_gulp')
+
+	shel.print_atom(mode='cart_fhiaims')
+	shel.print_atom(mode='frac_fhiaims')
+
 	sys.exit()
 
 	atom.print_cart()
