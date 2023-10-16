@@ -146,7 +146,7 @@ class Atom(object):
 	'''
 		print messages
 	'''
-	def print_atom(self,mode=None):
+	def print_atom(self,mode=None,shel=False):
 
 		if mode == 'xyz':
 			print("%4s%14.8f%14.8f%14.8f" % (self.element,self.cart[0],self.cart[1],self.cart[2]))
@@ -252,6 +252,7 @@ class Shell(Atom):
 		else:
 			self.set_cart_shel(cart_shel)	
 
+	'''
 	def set_atom3d(self,element,lvectors,frac,frac_shel=None):
 		super().set_atom3d(element,lvectors,frac)
 		if frac_shel == None:
@@ -259,7 +260,7 @@ class Shell(Atom):
 		else:
 			self.set_frac_shel(frac_shel)
 		self.frac2cart_shel()		# using lvectors + frac -> calculate cart
-
+	'''
 	def set_atom3d(self,element,lvectors,cd,cd_shel=None,mode='frac'):
 		super().set_atom3d(element,lvectors,cd,mode=mode)
 		if cd_shel == None:
@@ -276,7 +277,7 @@ class Shell(Atom):
 		else:
 			if mode == 'frac':
 				self.set_frac_shel(cd_shel)
-				sefl.frac2cart_shel()
+				self.frac2cart_shel()
 			elif mode == 'cart':
 				self.set_cart_shel(cd_shel)
 				self.cart2frac_shel()
@@ -313,7 +314,8 @@ class Shell(Atom):
 	'''
 
 	# overriding
-	def print_atom(self,shel=True,mode=None):
+	#def print_atom(self,shel=True,mode=None):
+	def print_atom(self,mode=None,shel=False):
 
 		super().print_atom(mode=mode)
 
@@ -394,16 +396,16 @@ if __name__ == "__main__":
 	print(shel.get_frac_shel())
 	print(shel.get_attr_gulp())
 
-	shel.print_atom(mode='xyz')
-	shel.print_atom(mode='cart_gulp')
-	shel.print_atom(mode='frac_gulp')
+	shel.print_atom(mode='xyz',shel=True)
+	shel.print_atom(mode='cart_gulp',shel=True)
+	shel.print_atom(mode='frac_gulp',shel=True)
 	print(" test2")
 	shel.print_atom(shel=False,mode='xyz')
 	shel.print_atom(shel=False,mode='cart_gulp')
 	shel.print_atom(shel=False,mode='frac_gulp')
 
 	shel.print_atom(mode='cart_fhiaims')
-	shel.print_atom(mode='frac_fhiaims')
+	shel.print_atom(mode='frac_fhiaims',shel=True)
 
 	sys.exit()
 

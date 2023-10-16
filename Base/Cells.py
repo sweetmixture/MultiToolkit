@@ -23,30 +23,67 @@ from Base.Atoms import Atom, Shell
 
 class Cell(object):
 
-	def __init__(self):
+	def __init__(self,name=None):
 
-		self.lvectors = [[0. for i in range(3)] for i in range(3)]
-		self.lconstants = [0. for i in range(3)]
-		self.langles = [0. for i in range(3)]
-		self.volume = 0.
-
-		self.atom_list = []
+		self.name		= name
+		self.lvectors	= [ [0. for i in range(3)] for i in range(3)]
+		self.lconstants = [ 0. for i in range(3)]
+		self.langles	= [ 0. for i in range(3)]
+		self.volume		= 0.
+		self.atom_list	= []
 
 	'''
 		setters
 	'''
 	def set_lvectors(self,lvectors):
-		self.lvectors = lvectors
+		if len(lvectors) == 3 and len(lvectors[0]) == 3:
+			for i in range(3):
+				for j in range(3):
+					try:
+						self.lvectors[i][j] = float(lvectors[i][j])
+					except:
+						print(f'Err casting float() lvectors failed',file=sys.stderr)
+						print(f'Err src : {__file__}',file=sys.stderr)
+						sys.exit()
+		else:
+			print(f'Err lvector dimension is not 3 x 3',file=sys.stderr)
+			print(f'Err src : {__file__}',file=sys.stderr)
+			sys.exit()
 
 	def set_lconstants(self,lconstants):
-		self.lconstants = lconstants
+		if len(lconstants) == 3:
+			for i in range(3):
+				try:
+					self.lconstants[i] = float(lconstants[i])
+				except:
+					print(f'Err casting float() cart failed',file=sys.stderr)
+					print(f'Err src : {__file__}',file=sys.stderr)
+					sys.exit()
+		else:
+			print(f'Err lcontant dimension is not 3',file=sys.stderr)
+			print(f'Err src : {__file__}',file=sys.stderr)
+			sys.exit()
 
 	def set_langles(self,langles):
-		self.langles = langles
+		if len(langles) == 3:
+			for i in range(3):
+				try:
+					self.langles[i] = float(langles[i])
+				except:
+					print(f'Err casting float() cart failed',file=sys.stderr)
+					print(f'Err src : {__file__}',file=sys.stderr)
+					sys.exit()
+		else:
+			print(f'Err langle dimension is not 3',file=sys.stderr)
+			print(f'Err src : {__file__}',file=sys.stderr)
+			sys.exit()
 
 	def set_volume(self):
 		self.volume = np.abs(np.dot(np.array(self.lvectors[0]),np.cross(np.array(self.lvectors[1]),np.array(self.lvectors[2]))))
 
+	'''
+		derived setter : 10.2023
+	'''
 	def set_lattice(self,lvectors=None,lconstants=None,langles=None):
 
 		#
@@ -56,7 +93,7 @@ class Cell(object):
 		#	[ bx, by, bz ]
 		#	[ cx, cy, cz ]	-> arbitrary orientation
 		#
-		if lvectors is not None and (lconstants is None and langles is None):
+		if lvectors is not None:
 
 			self.set_lvectors(lvectors)
 			self.set_volume()
@@ -85,19 +122,19 @@ class Cell(object):
 			self.lvectors = [a,b,c]
 			self.set_volume()
 
-	def add_atom(self,atom,frac=None):
+	def add_atom(self,atom):
 		self.atom_list.append(atom)
 
-	def create_atom(self,element,frac,frac2=None):
+	def create_atom(self,element,frac,frac_shel=None):
 
-		if frac2 is None:
+		if frac_shel is None:
 			atom = Atom()
 			atom.set_atom3d(element,self.lvectors,frac)
 			self.atom_list.append(atom)
 
-		if frac2 is not None:
+		if frac_shel is not None:
 			atom = Shell()
-			atom.set_atom3d(element,self.lvectors,frac,frac2)
+			atom.set_atom3d(element,self.lvectors,frac,frac_shel)
 			self.atom_list.append(atom)
 	'''
 		use in-place
@@ -109,6 +146,8 @@ class Cell(object):
 			algorithm
 			step 1. get lconstants / langles : a b c / al be ga
 			step 2. use conventional expression to re-define lattice vectors
+
+			-> must use 'ASE' 
 		'''
 
 	'''
@@ -116,18 +155,23 @@ class Cell(object):
 	'''
 	def del_atom(self,n):
 		if n == -1:
-			if len(self.atom_list) > 0:
+			try:
 				self.atom_list.pop()
+			except:
+				pass
 		if 0 <= n < len(self.atom_list):
 			del self.atom_list[n]
 			self.atom_list = [ atom for atom in self.atom_list if atom is not None ]
 
-	def empty_cell(self):
+	def empty(self):
 		self.atom_list.clear()
 
 	'''
 		getters
 	'''
+	def get_atoms(self):
+		return self.atom_list
+
 	def get_atom(self,n):
 		if 0 <= n < len(self.atom_list):
 			return self.atom_list[n]
@@ -137,57 +181,49 @@ class Cell(object):
 	def get_number_of_atoms(self):
 		return len(self.atom_list)
 
+	def get_lvectors(self):
+		return self.lvectors
+
+	def get_lattice_matrix(self):
+		return np.array(self.get_lvectors()).transpose().tolist()
+
+	def get_lconstants(self):
+		return self.lconstants
+
+	def get_langles(self):
+		return self.langles
+
+	def get_lvolume(self):
+		return self.volume
+
+
 	'''
 		print message
 	'''
-	# GULP input format comapatible
-	def print_lvectors_gulp(self):
-		print("vectors")
-		for lvector in self.lvectors:
-			print("%20.8f%14.8f%14.8f" % (lvector[0],lvector[1],lvector[2]))
+	# GULP input format comapatible : internal use only
+	def print_lvectors_gulp(self,vector=False):
+		if vector is True:
+			print('vectors')
+			for lvector in self.lvectors:
+				print('%14.8f%14.8f%14.8f' % (lvector[0],lvector[1],lvector[2]))
+		elif vector is False:
+			print('cell')
+			print('%14.8f%14.8f%14.8f%14.8f%14.8f%14.8f' % (				\
+				self.lconstants[0],self.lconstants[1],self.lconstants[2],		\
+				self.langles[0],self.langles[1],self.langles[2]))
 
-	# FHIaims *.in format compatible
+	# FHIaims *.in format compatible : internal use only
 	def print_lvectors_fhiaims(self):
 		for lvector in self.lvectors:
 			print("lattice_vector %14.8f%14.8f%14.8f" % (lvector[0],lvector[1],lvector[2]))
 
-	def print_cart_gulp(self,show_shel=True):
-
+	def print_atoms(self,mode=None,shel=False):
 		for atom in self.atom_list:
-			if atom.get_attr_gulp() == 'atom':
-				atom.print_cart_gulp()
-			if atom.get_attr_gulp() == 'shel':
-				atom.print_cart_gulp(show_shel=show_shel)
-
-	def print_frac_gulp(self,show_shel=True):
-
-		for atom in self.atom_list:
-			if atom.get_attr_gulp() == 'atom':
-				atom.print_frac_gulp()
-			if atom.get_attr_gulp() == 'shel':
-				atom.print_frac_gulp(show_shel=show_shel)
-
-	def print_cart_fhiaims(self):
-		for atom in self.atom_list:
-			atom.print_cart_fhiaims()
-
-	def print_frac_fhiaims(self):
-		for atom in self.atom_list:
-			atom.print_frac_fhiaims()
-
-	# Non standard
-	def print_cart(self):
-		for atom in self.atom_list:
-			atom.print_cart()
-
-	def print_frac(self):
-		for atom in self.atom_list:
-			atom.print_frac()
-	
+			atom.print_atom(mode=mode,shel=shel)
 	'''
 		file write
 	'''
-	def write_config_gulp(self,path=None,name='config.gulp',rule='frac',show_shel=True):
+	def write_gulp(self,path=None,name='cell.gulp',vector=False,rule='frac',shel=False,stdout=False):
 
 		if path is not None:
 			if os.path.exists(path):	# if path true
@@ -196,14 +232,19 @@ class Cell(object):
 			#else -> in-place writing
 		stdout_buffer = io.StringIO()
 		with contextlib.redirect_stdout(stdout_buffer):
-			self.print_lvectors_gulp()
+			self.print_lvectors_gulp(vector=vector)
 			if rule == 'frac':
 				print('fractional')
-				self.print_frac_gulp(show_shel=show_shel)
+				self.print_atoms(mode='frac_gulp',shel=shel)
 			if rule == 'cart':
 				print('cartesian')
-				self.print_cart_gulp(show_shel=show_shel)
+				self.print_atoms(mode='cart_gulp',shel=shel)
+
 		captured_stdout = stdout_buffer.getvalue()
+	
+		if stdout is True:
+			print(captured_stdout)
+			return
 
 		try:
 			with open(name,'w') as f:
@@ -212,7 +253,7 @@ class Cell(object):
 		except FileNotFoundError as e:
 			print(e)
 
-	def write_config_fhiaims(self,path=None,name='config.fhiaims',rule='frac'):
+	def write_fhiaims(self,path=None,name='cell.fhiaims',rule='frac',stdout=False):
 
 		if path is not None:
 			if os.path.exists(path):	# if path true
@@ -223,10 +264,14 @@ class Cell(object):
 		with contextlib.redirect_stdout(stdout_buffer):
 			self.print_lvectors_fhiaims()
 			if rule == 'frac':
-				self.print_frac_fhiaims()
+				self.print_atoms(mode='frac_fhiaims')
 			if rule == 'cart':
-				self.print_cart_fhiaims()
+				self.print_atoms(mode='cart_fhiaims')
 		captured_stdout = stdout_buffer.getvalue()
+
+		if stdout is True:
+			print(captured_stdout)
+			return
 
 		try:
 			with open(name,'w') as f:
@@ -234,6 +279,32 @@ class Cell(object):
 				f.flush()
 		except FileNotFoundError as e:
 			print(e)
+
+	def write_xyz(self,path=None,name='cell.xyz',stdout=False):
+
+		if path is not None:
+			if os.path.exists(path):	# if path true
+				path = os.path.join(path,name)
+				name = path
+			#else -> in-place writing
+		stdout_buffer = io.StringIO()
+		with contextlib.redirect_stdout(stdout_buffer):
+			print(f'{self.get_number_of_atoms()}')
+			print('')
+			self.print_atoms(mode='xyz')
+		captured_stdout = stdout_buffer.getvalue()
+
+		if stdout is True:
+			print(captured_stdout)
+			return
+
+		try:
+			with open(name,'w') as f:
+				f.write(captured_stdout)
+				f.flush()
+		except FileNotFoundError as e:
+			print(e)
+
 
 if __name__ == "__main__":
 
@@ -265,7 +336,6 @@ if __name__ == "__main__":
 	cell2.set_lattice(lconstants=lconstants,langles=langles)
 
 
-
 	cell3 = Cell()
 	lvectors = [[4.2112,0.,0.],[0.,4.2112,0.],[0.,0.,5.312]]
 	cell3.set_lattice(lvectors=lvectors)
@@ -279,36 +349,21 @@ if __name__ == "__main__":
 	cell3.create_atom('O',[0.0,0.0,0.5],[0.0,0.0,0.5])	# create_atom shel
 	cell3.create_atom('O',[0.5,0.5,0.5],[0.5,0.5,0.5])	# create_atom shel
 
-	cell3.print_lvectors_fhiaims()
-	cell3.print_frac_fhiaims()
 
-	cell3.print_lvectors_fhiaims()
-	cell3.print_cart_fhiaims()
-	
-	print(' -- show all')
-	cell3.print_cart_gulp()
-	cell3.print_frac_gulp()
+	print('----possible combo 1')
+	cell3.write_gulp(name='gcell_0')
+	cell3.write_gulp(path='./run',name='gcell_1')
+	cell3.write_gulp(path='./run',name='gcell_2',vector=True)
+	cell3.write_gulp(path='./run',name='gcell_3',vector=True,rule='cart')
+	cell3.write_gulp(path='./run',name='gcell_4',vector=True,rule='frac')
+	cell3.write_gulp(path='./run',name='gcell_5',vector=True,rule='cart',shel=True)
 
-	print(' -- show')
-	cell3.print_cart_gulp()
-	cell3.print_frac_gulp()
+	print('----possible combo 2')
+	cell3.write_fhiaims(name='fcell_0')
+	cell3.write_fhiaims(path='./run',name='fcell_1',rule='frac')
+	cell3.write_fhiaims(path='./run',name='fcell_2',rule='cart')
 
-	print(' -- show show_shel=False')
-	cell3.print_cart_gulp(show_shel=False)
-	cell3.print_frac_gulp(show_shel=False)
-
-	print(' -- show show_shel=True') # implicitly True see Atoms.py
-	cell3.print_cart_gulp()
-	cell3.print_frac_gulp()
-
-	# checked - 19.09.2023
-	#cell3.write_config_gulp(path='./run',name='1.config.gulp',show_shel=False)
-	#cell3.write_config_gulp(path='./run',name='2.config.gulp',show_shel=True)	# already implicity True 'show_shel'
-
-	cell3.write_config_gulp(path='./run',name='3.config.gulp',rule='cart',show_shel=False)
-	cell3.write_config_gulp(path='./run',name='4.config.gulp',rule='cart',show_shel=True)
-
-	cell3.write_config_fhiaims(name='1.config.fhiaims',rule='cart')
-	cell3.write_config_fhiaims(name='2.config.fhiaims',rule='frac')
-
-	print(cell3.volume)
+	print('----possible combo 3')
+	cell3.write_fhiaims(name='fcell_out',rule='cart',stdout=True)
+	cell3.write_xyz(name='xyz_0',stdout=True)
+	sys.exit()
