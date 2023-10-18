@@ -79,6 +79,14 @@ class Cluster(object):
 		return len(self.atom_list)
 
 	'''
+		Utils
+	'''
+	# delemte atoms too close to each other
+	def remove_duplicates(self,cutd=0.05):
+
+		NotImplemented
+
+	'''
 		print message
 	'''
 	def print_atoms(self,mode=None,shel=False): # internal use
@@ -89,7 +97,7 @@ class Cluster(object):
 	'''
 		file write
 	'''
-	def write_gulp(self,path=None,name='cluster.gulp',shel=False):
+	def write_gulp(self,path=None,name='cluster.gulp',shel=False,stdout=False):
 
 		if path is not None:
 			if os.path.exists(path):	# if path true
@@ -102,6 +110,10 @@ class Cluster(object):
 			self.print_atoms(mode='cart_gulp',shel=shel)
 		captured_stdout = stdout_buffer.getvalue()
 
+		if stdout is True:
+			print(captured_stdout)
+			return
+
 		try:
 			with open(name,'w') as f:
 				f.write(captured_stdout)
@@ -109,7 +121,7 @@ class Cluster(object):
 		except FileNotFoundError as e:
 			print(e)
 
-	def write_fhiaims(self,path=None,name='cluster.fhiaims'):
+	def write_fhiaims(self,path=None,name='cluster.fhiaims',stdout=False):
 
 		if path is not None:
 			if os.path.exists(path):	# if path true
@@ -120,6 +132,10 @@ class Cluster(object):
 		with contextlib.redirect_stdout(stdout_buffer):
 			self.print_atoms(mode='cart_fhiaims')
 		captured_stdout = stdout_buffer.getvalue()
+
+		if stdout is True:
+			print(captured_stdout)
+			return
 
 		try:
 			with open(name,'w') as f:

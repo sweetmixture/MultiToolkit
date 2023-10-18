@@ -189,23 +189,31 @@ def find_MX_clusters(cell,M='',X='',cutd=4.0):
 #
 def merge_clusters(clusters):
 
-	NotImplemented
+	Rcluster = Cluster()
 
+	for cluster in clusters:
+		atoms = cluster.get_atoms()
+		for atom in atoms:
+			Rcluster.add_atom(atom)		
+
+	#cluster.remove_duplicates()
+
+	return Rcluster
 
 if __name__ == '__main__':
 
-	cell = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.2/MoveX/local_177/run__7otq69o9/runs/run_1/geometry.in')
-	print('-- fhiaims fractional')
-	cell.write_fhiaims(rule='frac',stdout=True)
-	print('-- fhiaims cartesian')
-	cell.write_fhiaims(rule='cart',stdout=True)
+	#cell = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.2/MoveX/local_177/run__7otq69o9/runs/run_1/geometry.in')
+	#print('-- fhiaims fractional')
+	#cell.write_fhiaims(rule='frac',stdout=True)
+	#print('-- fhiaims cartesian')
+	#cell.write_fhiaims(rule='cart',stdout=True)
 
 	print('-- test 2')
 	cell = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveX/summary_1-210/180_aims_final.in')
 	print('-- fhiaims fractional')
 	cell.write_fhiaims(rule='frac',stdout=True)
-	#print('-- fhiaims cartesian')
-	#cell.write_fhiaims(rule='cart',stdout=True)
+	print('-- fhiaims cartesian')
+	cell.write_fhiaims(rule='cart',stdout=True)
 
 
 	print('-- test 3')
@@ -225,14 +233,13 @@ if __name__ == '__main__':
 	print(' * * * unit test 2 done * * * ')
 	print('')
 
+	print(len(clusters))
+	print(clusters[0].get_number_of_atoms())
+	print('')
+	print(clusters[0].print_atoms(mode='cart_gulp'))
 
+	print(' * * * unit test 3 done * * * ')
 
-
-
-
-
-
-
-
-
+	cluster = merge_clusters(clusters)
+	cluster.write_fhiaims(stdout=True)
 
