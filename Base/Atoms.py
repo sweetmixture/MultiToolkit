@@ -358,12 +358,6 @@ class Shell(Atom):
 		super().print_cart()
 		print("%3s%14.8f%14.8f%14.8f shell" % (self.element,self.frac_shel[0],self.frac_shel[1],self.frac_shel[2]))
 
-'''
-	Utilities
-'''
-
-
-
 
 if __name__ == "__main__":
 

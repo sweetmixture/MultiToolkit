@@ -35,10 +35,52 @@ from Base.Clusters import Cluster
 	Reporting internal cell : A. beta_angles (3) . delta_beta_angles (3) / B. delta_d (8) / C. SigmaSquraed (8)
 	Reporting cell          : lattice constants / lattice angles / lattice volume / energy /
 
+	1. delta_d
+	2. sigma_squared
+
+	3. delta_beta
+
+	done
+	lattice_constants
+	lattice_angles
+	lattice_volume
+	energy
+
 '''
 
 #
-#	(1) Read FHIaims periodic cell
+#	Basic utils
+#
+def get_distance(atomA,atomB,cell=None):
+
+	# if cell is None -> 0d : cluster
+	if cell == None:
+		cartA = np.array(atomA.get_cart())
+		cartB = np.array(atomB.get_cart())
+		dcart = cartA - cartB 
+		dist = np.linalg.norm(dcart)
+	# cell -> 3d PBC
+	else:
+		fracA = atomA.get_frac()
+		fracB = atomB.get_frac()
+		dfrac  = [ 0. for i in range(3) ]
+
+		# i: 1,2,3 -> vector 'a','b','c'
+		for i in range(3):
+			if fracA[i] - fracB[i] <= -0.5:
+				fracB[i] = fracB[i] - 1.0
+				dfrac[i] = fracA[i] - fracB[i]
+			elif 0.5 <= fracA[i] - fracB[i]:
+				fracB[i] = fracB[i] + 1.0
+				dfrac[i] = fracA[i] - fracB[i]
+			else:
+				dfrac[i] = fracA[i] - fracB[i]
+		dist_vector = np.dot(np.array(cell.get_lattice_matrix()),np.array(dfrac))
+		dist = np.linalg.norm(dist_vector)
+	return dist
+
+#
+#	(1) Read FHIaims periodic cell : Return <Cell>
 #
 def read_fhiaims_cell(path):
 
@@ -132,48 +174,23 @@ def find_MX_clusters(cell,M='',X='',cutd=4.0):
 					fracM = atomM.get_frac()
 					fracX = atomX.get_frac()
 					# workspace
-					fracXn = [ 0. for i in range(3) ]
 					dfrac  = [ 0. for i in range(3) ]
 
-					# (1) along 'a' lvector
-					if fracM[0] - fracX[0]  <= -0.5:
-						fracXn[0] = fracX[0] - 1.0
-						dfrac[0]  = fracM[0] - fracXn[0]
-					elif 0.5 <= fracM[0] - fracX[0]:
-						fracXn[0] = fracX[0] + 1.0
-						dfrac[0] = fracM[0] - fracXn[0]
-					else:
-						fracXn[0] = fracX[0]
-						dfrac[0] = fracM[0] - fracX[0]
-
-					# (2) along 'b' lvector
-					if fracM[1] - fracX[1]  <= -0.5:
-						fracXn[1] = fracX[1] - 1.0
-						dfrac[1]  = fracM[1] - fracXn[1]
-					elif 0.5 <= fracM[1] - fracX[1]:
-						fracXn[1] = fracX[1] + 1.0
-						dfrac[1] = fracM[1] - fracXn[1]
-					else:
-						fracXn[1] = fracX[1]
-						dfrac[1] = fracM[1] - fracX[1]
-
-					# (3) along 'c' lvector
-					if fracM[2] - fracX[2]  <= -0.5:
-						fracXn[2] = fracX[2] - 1.0
-						dfrac[2]  = fracM[2] - fracXn[2]
-					elif 0.5 <= fracM[2] - fracX[2]:
-						fracXn[2] = fracX[2] + 1.0
-						dfrac[2] = fracM[2] - fracXn[2]
-					else:
-						fracXn[2] = fracX[2]
-						dfrac[2] = fracM[2] - fracX[2]
-
+					for i in range(3):
+						if fracM[i] - fracX[i]  <= -0.5:
+							fracX[i] = fracX[i] - 1.0
+							dfrac[i]  = fracM[i] - fracX[i]
+						elif 0.5 <= fracM[i] - fracX[i]:
+							fracX[i] = fracX[i] + 1.0
+							dfrac[i] = fracM[i] - fracX[i]
+						else:
+							dfrac[i] = fracM[i] - fracX[i]
 					# calculate distance
 					dist_vector = np.dot(np.array(cell.get_lattice_matrix()),np.array(dfrac))
 					dist = np.linalg.norm(dist_vector)
-
+					#dist = get_distance(atomM,atomX,cell=cell)
 					if dist < cutd:
-						cart = np.dot(np.array(cell.get_lattice_matrix()),np.array(fracXn)).tolist()
+						cart = np.dot(np.array(cell.get_lattice_matrix()),np.array(fracX)).tolist()
 						# create atom
 						atom = Atom()
 						atom.set_atom0d(atomX.get_element(),cart)
@@ -189,16 +206,218 @@ def find_MX_clusters(cell,M='',X='',cutd=4.0):
 #
 def merge_clusters(clusters):
 
+	Wcluster = Cluster()
 	Rcluster = Cluster()
+	duplist = []
 
+	# load clusters
 	for cluster in clusters:
 		atoms = cluster.get_atoms()
 		for atom in atoms:
-			Rcluster.add_atom(atom)		
+			Wcluster.add_atom(atom)		
 
-	#cluster.remove_duplicates()
+	# remove duplicates
+	atomlist = Wcluster.get_atoms()
+	for i in range(len(atomlist)):
+		carti = atomlist[i].get_cart()
+		for j in range(i+1,len(atomlist)):
+			cartj = atomlist[j].get_cart()
+
+			# duplicated check
+			rij = np.linalg.norm(np.array(carti)-np.array(cartj))
+			if rij < 10E-8:
+				duplist.append(j)
+
+	for i in range(len(atomlist)):
+		if i not in duplist:
+			Rcluster.add_atom(atomlist[i])
 
 	return Rcluster
+
+
+
+#	------------------------------------------------------------------------------
+#		Geometric data extracting functions
+#	------------------------------------------------------------------------------
+
+#
+#	A. Delta D calculator : 'clusters' -> 8 Oh clusters list
+#
+def calculate_delta_d(clusters,C='',S=''):
+	
+	# delta_d list
+	ddlist = []
+
+	# looping 8 clusters
+	for cluster in clusters:
+		atoms = cluster.get_atoms()
+		dlist = []
+		dave = 0.
+		delta_d = 0.
+
+		for atomC in atoms:
+			if atomC.get_element() == C:
+
+				for atomS in atoms:
+					if atomS.get_element() == S:
+						dlist.append(get_distance(atomC,atomS))
+
+		dave = np.mean(np.array(dlist))
+
+		for d in dlist:
+			delta_d = delta_d + (d - dave)*(d - dave) / dave / dave
+		delta_d = delta_d/6.
+
+		ddlist.append(delta_d)
+
+	return ddlist
+#
+#	B. SigmaSqured calculator : 'clusters' -> 8 Oh clusters list
+#
+def calculate_sigma_squared(clusters,C='',S='',cuta=120.):
+
+	# ss list
+	sslist = []
+	
+	# looping 8 clusters
+	for cluster in clusters:
+
+		atoms = cluster.get_atoms()
+		thelist = []
+		sigsqr = 0.
+		atomC = None
+
+		# get centric atom 'C'
+		for atom in atoms:
+			if atom.get_element() == C:
+				atomC = atom
+
+		# get surr atom 'S'
+		atomS_list = []
+		for atom in atoms:
+			if atom.get_element() == S:
+				atomS_list.append(atom)
+		
+		# calculate S-C-S cis angles
+		for i in range(len(atomS_list)):
+			for j in range(i+1,len(atomS_list)):
+
+				rcs1 = np.array(atomS_list[i].get_cart()) - np.array(atomC.get_cart())
+				rcs2 = np.array(atomS_list[j].get_cart()) - np.array(atomC.get_cart())
+
+				RCS1 = get_distance(atomS_list[i],atomC)
+				RCS2 = get_distance(atomS_list[j],atomC)
+
+				the = np.dot(rcs1,rcs2) / RCS1 / RCS2
+				the = np.clip(the,-1.0,1.0)
+				the_rad = np.arccos(the)
+				the_deg = np.degrees(the_rad)
+
+				if the_deg < cuta:
+					thelist.append(the_deg)
+
+		for the in thelist:
+			sigsqr = sigsqr + (the-90.)*(the-90.)/11.
+
+		sslist.append(sigsqr)
+
+	return sslist
+
+#
+#	C. Beta angle extractor: M-X-M angle, 'cluster' 8 Oh clusters after removing duplicates
+#
+def calculate_beta(cluster,C='',S='',cutd=4.0):
+
+	beta_a = []
+	beta_b = []
+	beta_c = []
+	
+	for atomC in cluster.get_atoms():
+
+		if atomC.get_element() == C:
+			surr_atomlist = []
+			rc = atomC.get_cart()
+
+			for atomS in cluster.get_atoms():
+
+				if atomS.get_element() == S:
+					rs = atomS.get_cart()
+
+					if np.linalg.norm(np.array(rc)-np.array(rs)) < cutd:
+						surr_atomlist.append(atomS)
+
+			if len(surr_atomlist) == 2:
+
+				rc = np.array(rc)
+				rs1 = np.array(surr_atomlist[0].get_cart())
+				rs2 = np.array(surr_atomlist[1].get_cart())
+				rcs1 = rs1 - rc
+				rcs2 = rs2 - rc
+
+				RCS1 = np.linalg.norm(rcs1)
+				RCS2 = np.linalg.norm(rcs2)
+
+				beta = np.dot(rcs1,rcs2)/RCS1/RCS2
+				beta = np.clip(beta,-1.0,1.0)
+				beta_rad = np.arccos(beta)
+				beta_deg = np.degrees(beta_rad)
+
+				# get direction
+				dvector = (np.array(rs1) - np.array(rs2)).tolist()
+				for i,elem in enumerate(dvector):
+					if elem < 0.:
+						dvector[i] = -dvector[i]
+				dir_idx = dvector.index(max(dvector))
+				if dir_idx == 0:
+					beta_a.append(beta_deg)
+				elif dir_idx == 1:
+					beta_b.append(beta_deg)
+				else:
+					beta_c.append(beta_deg)
+
+	return beta_a,beta_b,beta_c
+
+#
+#	D. R1 - R0 : R1 after VVUQ uncertainty application, R0 original sample
+#
+def calculate_deltaR(cell1,cell0):
+
+	signtable = []
+	deltaR = []
+	rmsd = 0.
+
+	atomlist1 = cell1.get_atoms()
+	atomlist0 = cell0.get_atoms()
+
+	for atom1, atom0 in zip(atomlist1,atomlist0):
+
+		r1 = np.array(atom1.get_cart())
+		r0 = np.array(atom0.get_cart())
+		dr = (r1 - r0)
+
+		dr_sqr = np.dot(dr,dr)
+		rmsd = rmsd + dr_sqr
+
+		dr = dr.tolist()
+
+		for item in dr:
+			if -1.E-9 < item and item < 1.E-9:
+				item = 0.
+			deltaR.append(item)
+
+			if item > 0.:
+				sign = '+'
+			elif item < 0.:
+				sign = '-'
+			else:
+				sign = '0'
+
+			signtable.append(sign)
+
+	rmsd = np.sqrt(rmsd)
+
+	return deltaR, signtable, rmsd
+
 
 if __name__ == '__main__':
 
@@ -209,7 +428,8 @@ if __name__ == '__main__':
 	#cell.write_fhiaims(rule='cart',stdout=True)
 
 	print('-- test 2')
-	cell = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveX/summary_1-210/180_aims_final.in')
+	#cell = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveX/summary_1-210/180_aims_final.in')
+	cell = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveA/local_103/run__v0ph_o3m/runs/run_3/geometry.in.next_step')
 	print('-- fhiaims fractional')
 	cell.write_fhiaims(rule='frac',stdout=True)
 	print('-- fhiaims cartesian')
@@ -217,20 +437,19 @@ if __name__ == '__main__':
 
 
 	print('-- test 3')
-	#print(cell.get_lvectors())
-	#print(cell.get_lvolume())
-	#print(cell.get_langles())
-	#print(cell.get_lconstants())
+	print('Lvectors:    ',cell.get_lvectors())
+	print('Lvolume:     ',cell.get_lvolume())
+	print('Langles:     ',cell.get_langles())
+	print('Lconstants:  ',cell.get_lconstants())
 
-	print(' * * * unit test 1 done * * * ')
-	print('')
+	print(' * * * unit test 1 done * * * : read fhiaims geometry')
 
 	clusters = find_MX_clusters(cell,M='Pb',X='I')		# find clusters in cartesian coordinates
 	print(f'Number of Oh MX6 units: {len(clusters)}')
 	for cluster in clusters:
 		cluster.print_atoms(mode='xyz')
 
-	print(' * * * unit test 2 done * * * ')
+	print(' * * * unit test 2 done * * * : extract Oh clusters')
 	print('')
 
 	print(len(clusters))
@@ -238,8 +457,52 @@ if __name__ == '__main__':
 	print('')
 	print(clusters[0].print_atoms(mode='cart_gulp'))
 
-	print(' * * * unit test 3 done * * * ')
+	print(' * * * unit test 3 done * * * : check clusters ')
 
 	cluster = merge_clusters(clusters)
-	cluster.write_fhiaims(stdout=True)
+	cluster.write_xyz(stdout=True)
+	beta_a, beta_b, beta_c = calculate_beta(cluster,C='I',S='Pb')
+	print(beta_a)
+	print(beta_b)
+	print(beta_c)
+	print(' * * * unit test 4 done * * * : check cluster merge / beta angles')
 
+	ddlist = calculate_delta_d(clusters,C='Pb',S='I')
+	print((np.array(ddlist)*100000.).tolist())
+	print(np.array(ddlist).tolist())
+
+	print(' * * * unit test 5 done * * * : delta d')
+
+	print(' # sig sqr')
+	sslist = calculate_sigma_squared(clusters,C='Pb',S='I')
+	print(sslist)
+
+	print(' * * * unit test 6 done * * * : sigma squared ')
+
+
+
+	print(' ---------------------------------------------------------------- ')
+	print('	R1 - R0')
+	print(' R1 : after VVUQ uncertainty')
+	print(' R0 : original sample')
+	print(' ---------------------------------------------------------------- ')
+
+	#cell0 = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveX/summary/14_aims_init.in')
+	cell0 = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveA/summary_1-237/aims_init.in')
+
+	if cell0 is not False:
+		cell0.write_fhiaims(rule='frac',stdout=True)
+		#cell0.write_xyz(stdout=True)
+
+	cell1 = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveA/local_1/run__izsdcjof/runs/run_2/geometry.in')
+	cell1 = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E1.3/MoveX/summary/14_aims_init.in')	
+
+	if cell1 is not False:
+		cell1.write_fhiaims(rule='frac',stdout=True)
+		#cell1.write_xyz(stdout=True)
+
+	deltaR, signtable, Rrmsd = calculate_deltaR(cell1,cell0)
+
+	print(deltaR)
+	print(signtable)
+	print(Rrmsd)

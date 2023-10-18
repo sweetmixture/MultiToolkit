@@ -144,7 +144,7 @@ class Cluster(object):
 		except FileNotFoundError as e:
 			print(e)
 
-	def write_xyz(self,path=None,name='cluster.xyz'):
+	def write_xyz(self,path=None,name='cluster.xyz',stdout=False):
 
 		if path is not None:
 			if os.path.exists(path):	# if path true
@@ -157,6 +157,10 @@ class Cluster(object):
 			print('')
 			self.print_atoms(mode='xyz')
 		captured_stdout = stdout_buffer.getvalue()
+
+		if stdout is True:
+			print(captured_stdout)
+			return
 
 		try:
 			with open(name,'w') as f:
