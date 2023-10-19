@@ -125,6 +125,9 @@ class Cell(object):
 	def add_atom(self,atom):
 		self.atom_list.append(atom)
 
+	def set_atom_list(self,atom_list):
+		self.atom_list = atom_list
+
 	def create_atom(self,element,frac,frac_shel=None):
 
 		if frac_shel is None:
@@ -149,7 +152,6 @@ class Cell(object):
 
 			-> must use 'ASE' 
 		'''
-
 	'''
 		destructors
 	'''
@@ -182,9 +184,17 @@ class Cell(object):
 		return len(self.atom_list)
 
 	def get_lvectors(self):
+		# * convention
+		# [ a1 a2 a3 ] 
+		# [ b1 b2 b3 ]
+		# [ c1 c2 c3 ]
 		return self.lvectors
 
 	def get_lattice_matrix(self):
+		# * convention
+		# [ a1 b1 c1 ]
+		# [ a2 b2 c2 ]
+		# [ a3 b3 c3 ]
 		return np.array(self.get_lvectors()).transpose().tolist()
 
 	def get_lconstants(self):
@@ -196,6 +206,44 @@ class Cell(object):
 	def get_lvolume(self):
 		return self.volume
 
+	# Experimental 19.10.23
+	def sort_lattice(self,rule='lconstants'):
+
+		print(self.get_lconstants())
+		for i in range(2):
+			for j in range(2-i):
+				lc = self.get_lconstants()
+				if lc[j] > lc[j+1]:
+					print(f'swap!, {lc[j]} > {lc[j+1]}')
+					# swap
+					lvector_tmp = self.lvectors[j]
+					self.lvectors[j] = self.lvectors[j+1]
+					self.lvectors[j+1] = lvector_tmp
+					# reset lattice
+					self.set_lattice(lvectors=self.lvectors)
+
+					# reset atoms
+					new_atom_list = []
+					for atom in self.get_atoms():
+
+						element  = atom.get_element()
+						new_frac = atom.get_frac()
+
+						# swap
+						frac_tmp = new_frac[j]
+						new_frac[j] = new_frac[j+1]
+						new_frac[j+1] = frac_tmp
+
+						atom = Atom()
+						atom.set_atom3d(element,self.lvectors,new_frac,mode='frac')
+						new_atom_list.append(atom)
+
+					self.set_atom_list(new_atom_list)
+
+
+		print(self.get_lconstants())
+		print(self.lvectors)
+		
 
 	'''
 		print message
