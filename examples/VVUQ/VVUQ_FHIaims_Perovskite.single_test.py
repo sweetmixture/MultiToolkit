@@ -17,8 +17,9 @@ if __name__ == '__main__':
 
 	# load final - after optimisation
 	#cell_final = read_fhiaims_cell(sys.argv[2])
-	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/511_aims_final.in')
-	#cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/87_aims_final.in')
+	#cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/511_aims_final.in')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/87_aims_final.in')
+	print('* * * before rotation')
 	print(cell_final.get_lvectors())
 	print(cell_final.get_lconstants())
 	print(cell_final.get_langles())
@@ -28,8 +29,10 @@ if __name__ == '__main__':
 	#	lattice vector sorting test  : see '/work/e05/e05/wkjee/Software/MultiToolkit/Base/single_test'
 	#
 	cell_final = cell_final.sort_lattice()
+	print('rotation reference')
 	print(cell_final.sort_lattice_reference)
 
+	print('* * * after rotation')
 	print(cell_final.get_lvectors())
 	print(cell_final.get_lconstants())
 	print(cell_final.get_langles())

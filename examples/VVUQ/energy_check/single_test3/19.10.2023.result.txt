@@ -1,0 +1,7 @@
+#
+# Single Point Energy - 19.10.2023
+#
+#   Testing lattice vector sorting (Experimental method)
+# 
+org  :-11162490.530006899       -> original sample after standard FHIaims optimisation
+fswap:-11162490.530006921       -> full swap                    : including lattice vector sorting together with atom fractional coordinates
