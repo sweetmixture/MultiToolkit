@@ -1,7 +1,7 @@
 #!/bin/python
 
 import numpy as np
-import os
+import os,copy
 
 from Base.Atoms import Atom
 from Base.Cells import Cell
@@ -154,6 +154,9 @@ def read_fhiaims_cell(path):
 #
 def find_MX_clusters(cell,M='',X='',cutd=4.0):
 
+	#print('find MX * * *')
+	#print(cell.get_lvectors())
+
 	clusters = []
 
 	for atomM in cell.get_atoms():
@@ -171,8 +174,8 @@ def find_MX_clusters(cell,M='',X='',cutd=4.0):
 
 				if atomX.get_element() == X:
 
-					fracM = atomM.get_frac()
-					fracX = atomX.get_frac()
+					fracM = atomM.get_frac()		# get copy
+					fracX = atomX.get_frac()		# get copy
 					# workspace
 					dfrac  = [ 0. for i in range(3) ]
 
@@ -188,7 +191,7 @@ def find_MX_clusters(cell,M='',X='',cutd=4.0):
 					# calculate distance
 					dist_vector = np.dot(np.array(cell.get_lattice_matrix()),np.array(dfrac))
 					dist = np.linalg.norm(dist_vector)
-					#dist = get_distance(atomM,atomX,cell=cell)
+
 					if dist < cutd:
 						cart = np.dot(np.array(cell.get_lattice_matrix()),np.array(fracX)).tolist()
 						# create atom
@@ -196,8 +199,33 @@ def find_MX_clusters(cell,M='',X='',cutd=4.0):
 						atom.set_atom0d(atomX.get_element(),cart)
 						# add atom to cluster
 						cluster.add_atom(atom)
-					
-			clusters.append(cluster)
+
+			if cell.lsorted is True:
+				# use cell.sort_lattice_reference <list:float>[3]
+				lc = copy.copy(cell.sort_lattice_reference)
+
+				for i in range(2):
+					for j in range(2-i):
+						if lc[j] > lc[j+1]:
+
+							lc_tmp = lc[j]
+							lc[j] = lc[j+1]
+							lc[j+1] = lc_tmp
+
+							for atom in cluster.get_atoms():
+
+								cart_tmp = atom.cart[j]
+								atom.cart[j] = atom.cart[j+1]
+								atom.cart[j+1] = cart_tmp
+
+								if j == 0:
+									atom.cart[2] = -atom.cart[2]
+								if j == 1:
+									atom.cart[0] = -atom.cart[0]
+
+				clusters.append(cluster)
+			else:
+				clusters.append(cluster)
 
 	return clusters
 

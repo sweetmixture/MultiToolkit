@@ -18,14 +18,22 @@ if __name__ == '__main__':
 	# load final - after optimisation
 	#cell_final = read_fhiaims_cell(sys.argv[2])
 	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/511_aims_final.in')
+	#cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/87_aims_final.in')
+	print(cell_final.get_lvectors())
+	print(cell_final.get_lconstants())
+	print(cell_final.get_langles())
 
-	print('test')
+	#print('test')
 	#
 	#	lattice vector sorting test  : see '/work/e05/e05/wkjee/Software/MultiToolkit/Base/single_test'
 	#
-	cell_final.sort_lattice()
-	cell_final.write_fhiaims(stdout=True)
-	print('test END')
+	cell_final = cell_final.sort_lattice()
+	print(cell_final.sort_lattice_reference)
+
+	print(cell_final.get_lvectors())
+	print(cell_final.get_lconstants())
+	print(cell_final.get_langles())
+	#print('test END')
 
 	# ======
 	#	cell_uq - cell0
@@ -43,6 +51,10 @@ if __name__ == '__main__':
 	clusters = find_MX_clusters(cell_final,M='Pb',X='I')	# find Oh clusters
 	merged_cluster = merge_clusters(clusters)				# merge Oh clusters into 'merged_cluster'
 
+	cell_final.write_fhiaims(stdout=True)
+	#cell_final.write_xyz(stdout=True)
+	merged_cluster.write_xyz(stdout=True)
+
 	# beta angles
 	beta_a, beta_b, beta_c = calculate_beta(merged_cluster,C='I',S='Pb')	# beta_x <list:float>[3]
 
@@ -58,10 +70,10 @@ if __name__ == '__main__':
 	# ======
 
 	#print(lvectors)
-	#print(lconstants)
-	#print(langles)
-	#print(lvolume)
-	#print(beta_a,beta_b,beta_c)
+	print(lconstants)
+	print(langles)
+	print(lvolume)
+	print(beta_a,beta_b,beta_c)
 	#print(ddlist)
 	#print(sslist)
 

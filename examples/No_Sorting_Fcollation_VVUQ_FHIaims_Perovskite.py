@@ -19,9 +19,6 @@ if __name__ == '__main__':
 	cell_final = read_fhiaims_cell(sys.argv[2])
 	#cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/511_aims_final.in')
 
-	# sorting by lattice constants : Experimental 20.10.2023
-	cell_final = cell_final.sort_lattice()
-
 	# ======
 	#	cell_uq - cell0
 	# ======

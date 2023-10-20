@@ -16,7 +16,7 @@
 '''
 
 import numpy as np
-import os,sys,io
+import os,sys,io,copy
 import contextlib
 
 from Base.Atoms import Atom, Shell
@@ -32,6 +32,9 @@ class Cell(object):
 		self.volume		= 0.
 		self.atom_list	= []
 
+		# Experimental 20.10.2023
+		self.sort_lattice_reference = [ 0. for i in range(3) ]
+		self.lsorted = False
 	'''
 		setters
 	'''
@@ -209,42 +212,59 @@ class Cell(object):
 	# Experimental 19.10.23
 	def sort_lattice(self,rule='lconstants'):
 
-		print(self.get_lconstants())
+		self.sort_lattice_reference = copy.copy(self.get_lconstants())
+		self.lsorted = True
+
+		#print(self.get_lconstants())
 		for i in range(2):
 			for j in range(2-i):
+				# get current lattice constants
 				lc = self.get_lconstants()
+				# sorting lattice vectors based on lattice constants
 				if lc[j] > lc[j+1]:
-					print(f'swap!, {lc[j]} > {lc[j+1]}')
-					# swap
+
+					#lvector_tmp = self.lvectors[j]
+					#self.lvectors[j] = self.lvectors[j+1]
+					#self.lvectors[j+1] = lvector_tmp
+
 					lvector_tmp = self.lvectors[j]
 					self.lvectors[j] = self.lvectors[j+1]
 					self.lvectors[j+1] = lvector_tmp
-					# reset lattice
+					if j == 0:
+						self.lvectors[2] = (-np.array(self.lvectors[2])).tolist()
+					if j == 1:
+						self.lvectors[0] = (-np.array(self.lvectors[0])).tolist()
+
+					# update lattice
 					self.set_lattice(lvectors=self.lvectors)
 
-					# reset atoms
+					# sorting atom positions - following the lattice vector sorting
 					new_atom_list = []
 					for atom in self.get_atoms():
-
 						element  = atom.get_element()
 						new_frac = atom.get_frac()
 
-						# swap
+						# sorting
+						#frac_tmp = new_frac[j]
+						#new_frac[j] = new_frac[j+1]
+						#new_frac[j+1] = frac_tmp
+
 						frac_tmp = new_frac[j]
 						new_frac[j] = new_frac[j+1]
 						new_frac[j+1] = frac_tmp
+						if j == 0:
+							new_frac[2] = -new_frac[2] + 1.0
+						if j == 1:
+							new_frac[0] = -new_frac[0] + 1.0		# FIX PERMUTATION OF CLUSTER!!!
 
 						atom = Atom()
 						atom.set_atom3d(element,self.lvectors,new_frac,mode='frac')
 						new_atom_list.append(atom)
 
 					self.set_atom_list(new_atom_list)
-
-
-		print(self.get_lconstants())
-		print(self.lvectors)
-		
-
+		#print(self.get_lconstants())
+		#print(self.lvectors)
+		return self
 	'''
 		print message
 	'''

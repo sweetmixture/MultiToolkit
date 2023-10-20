@@ -15,7 +15,7 @@
 	13.10.2023  : exceptions, print* dumped
 '''
 import numpy as np
-import sys
+import sys, copy
 
 class Atom(object):
 
@@ -117,6 +117,7 @@ class Atom(object):
 		self.set_lvectors(lvectors)
 
 		if mode == 'frac':
+			#print(f'{element} : {cd}')
 			self.set_frac(cd)
 			self.frac2cart()			# save 'cart' from 'frac'
 		elif mode == 'cart':
@@ -132,13 +133,14 @@ class Atom(object):
 		getters (including returns)
 	'''
 	def get_element(self):
-		return self.element
+		#return self.element
+		return copy.copy(self.element)
 	
 	def get_cart(self):
-		return self.cart
+		return copy.copy(self.cart)
 
 	def get_frac(self):
-		return self.frac
+		return copy.copy(self.frac)
 
 	def get_attr_gulp(self):
 		return 'core'
@@ -300,10 +302,10 @@ class Shell(Atom):
 		return super().get_frac()
 
 	def get_cart_shel(self):
-		return self.cart_shel
+		return copy.copy(self.cart_shel)
 
 	def get_frac_shel(self):
-		return self.frac_shel
+		return copy.copy(self.frac_shel)
 
 	# overriding
 	def get_attr_gulp(self):
