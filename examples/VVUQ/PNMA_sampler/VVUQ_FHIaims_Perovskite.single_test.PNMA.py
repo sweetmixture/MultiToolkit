@@ -3,7 +3,7 @@
 import numpy as np
 import os,sys
 
-from Base.UtilsCell import read_fhiaims_cell, find_MX_clusters, merge_clusters, calculate_delta_d, calculate_sigma_squared, calculate_beta, calculate_deltaR
+from Base.UtilsCell import read_fhiaims_cell, find_MX_clusters,find_MX_clusters_pnma, merge_clusters, calculate_delta_d, calculate_sigma_squared, calculate_beta, calculate_beta_pnma, calculate_deltaR
 from AppOutputExtractor.FHIaims.FHIaimsOutputExtractor import extractor
 
 if __name__ == '__main__':
@@ -30,6 +30,7 @@ if __name__ == '__main__':
 	#
 	#	lattice vector sorting test  : see '/work/e05/e05/wkjee/Software/MultiToolkit/Base/single_test'
 	#
+
 	cell_final = cell_final.sort_lattice()
 	print('rotation reference')
 	print(cell_final.sort_lattice_reference)
@@ -53,19 +54,21 @@ if __name__ == '__main__':
 	langles = cell_final.get_langles()				# <list:float>[3]
 	lvolume = cell_final.get_lvolume()				# float
 
-	clusters = find_MX_clusters(cell_final,M='Pb',X='I')	# find Oh clusters
+	#clusters = find_MX_clusters(cell_final,M='Pb',X='I')	# find Oh clusters
+	clusters = find_MX_clusters_pnma(cell_final,M='Pb',X='I')	# find Oh clusters
 
-	for cluster in clusters:
-		cluster.write_xyz(stdout=True)
+	#for cluster in clusters:
+	#	cluster.write_xyz(stdout=True)
 
 	merged_cluster = merge_clusters(clusters)				# merge Oh clusters into 'merged_cluster'
 
-	#cell_final.write_fhiaims(stdout=True)
+	cell_final.write_fhiaims(stdout=True)
 	#cell_final.write_xyz(stdout=True)
 	merged_cluster.write_xyz(stdout=True)
 
 	# beta angles
-	beta_a, beta_b, beta_c = calculate_beta(merged_cluster,C='I',S='Pb')	# beta_x <list:float>[3]
+	#beta_a, beta_b, beta_c = calculate_beta(merged_cluster,C='I',S='Pb')	# beta_x <list:float>[3]
+	beta_a, beta_b, beta_c = calculate_beta_pnma(merged_cluster,C='I',S='Pb')	# beta_x <list:float>[3]
 
 	# delta d (ddlist)
 	ddlist = calculate_delta_d(clusters,C='Pb',S='I')	# ddlist <list:float>[8]

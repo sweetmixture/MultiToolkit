@@ -3,6 +3,7 @@ setup.py
 Base/Atoms.py
 Base/Cells.py
 Base/Clusters.py
+Base/UtilsCell.py
 Base/__init__.py
 Extractor/FHIaims.py
 Extractor/GULP.py

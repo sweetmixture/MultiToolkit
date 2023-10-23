@@ -265,6 +265,40 @@ class Cell(object):
 		#print(self.get_lconstants())
 		#print(self.lvectors)
 		return self
+
+
+	# Experimental - Create SuperCell : Need fix ! 23.10.2023
+	def create_supercell(self,supercell=[1,1,1]):
+		super_cell = Cell()
+
+		atoms = self.get_atoms()
+		lvectors = self.get_lvectors()
+	
+		super_lvector_a = ( np.array(lvectors[0]) * supercell[0] ).tolist()
+		super_lvector_b = ( np.array(lvectors[1]) * supercell[1] ).tolist()
+		super_lvector_c = ( np.array(lvectors[2]) * supercell[2] ).tolist()
+		super_lvectors = [ super_lvector_a, super_lvector_b, super_lvector_c ]
+
+		for i in range(supercell[0]):
+			for j in range(supercell[1]):
+				for k in range(supercell[2]):
+
+					lvector_a = ( (i+1) * np.array(lvectors[0]) ).tolist()
+					lvector_b = ( (j+1) * np.array(lvectors[1]) ).tolist()
+					lvector_c = ( (k+1) * np.array(lvectors[2]) ).tolist()
+
+					for atom in atoms:
+
+						element = atom.get_element()
+						frac = atom.get_frac()
+						nfrac = [ frac[0] / float(supercell[0]) * float(i+1), frac[1] / float(supercell[1]) * float(j+1), frac[2] / float(supercell[2]) * float(k+1) ]
+
+						natom = Atom()
+						natom.set_atom3d(element,super_lvectors,nfrac)
+
+						super_cell.add_atom(natom)
+
+		return super_cell
 	'''
 		print message
 	'''
