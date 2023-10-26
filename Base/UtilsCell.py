@@ -3,6 +3,8 @@
 import numpy as np
 import os,copy
 
+import math 
+
 from Base.Atoms import Atom
 from Base.Cells import Cell
 from Base.Clusters import Cluster
@@ -241,6 +243,8 @@ def find_MX_clusters_pnma(cell,M='',X='',cutd=4.0):
 
 	count = 0
 
+	#cell.lsorted = False
+
 	for atomM in cell.get_atoms():
 
 		if atomM.get_element() == M:		
@@ -289,19 +293,50 @@ def find_MX_clusters_pnma(cell,M='',X='',cutd=4.0):
 			ncluster = Cluster()
 			lvectors = cell.get_lvectors()
 
+			case_x = False
+			case_y = False
+			# sign setter depending on 'M' atom position
+			for atom in cluster.get_atoms():
+				if atom.get_element() == M:
+					cart = atom.get_cart()
+					if math.fabs(cart[0]) < math.fabs(cart[1]):
+						case_y = True
+						if cart[2] > 0.:
+							case_y = False
+							case_x = True
+					if math.fabs(cart[0]) > math.fabs(cart[1]):
+						case_x = True
+						if cart[2] > 0.:
+							case_x = False
+							case_y = True
+					break
+
 			for atom in cluster.get_atoms():
 
 				element = atom.get_element()
 				cart    = atom.get_cart()
 
-				if count == 1 or count == 3:
+				#if count == 1 or count == 3:
+				#	ncart = (np.array(cart) + np.array(lvectors[1])).tolist()
+				#elif count == 2 or count == 4:
+				#	ncart = (np.array(cart) + np.array(lvectors[0])).tolist()
+
+				#if math.fabs(cart[0]) < math.fabs(cart[1]):
+				#	ncart = (np.array(cart) + np.array(lvectors[1])).tolist()
+				#if math.fabs(cart[0]) > math.fabs(cart[1]):
+				#	ncart = (np.array(cart) + np.array(lvectors[0])).tolist()
+
+				if case_y == True:
 					ncart = (np.array(cart) + np.array(lvectors[1])).tolist()
-				elif count == 2 or count == 4:
+				if case_x == True:
 					ncart = (np.array(cart) + np.array(lvectors[0])).tolist()
+				
 				natom = Atom()
 				natom.set_atom0d(element,ncart)
 				ncluster.add_atom(natom)
 
+			# sorting -------------------------------------------------------
+			# if cell sorted
 			if cell.lsorted is True:
 				# use cell.sort_lattice_reference <list:float>[3]
 				lc = copy.copy(cell.sort_lattice_reference)
@@ -580,7 +615,7 @@ def calculate_beta_pnma(cluster,C='',S='',cutd=4.0):
 
 				# get direction
 				dvector = (np.array(rs1) - np.array(rs2)).tolist()
-				print(dvector)
+				#print(dvector)
 				for i,elem in enumerate(dvector):
 					if elem < 0.:
 						dvector[i] = -dvector[i]
@@ -630,7 +665,7 @@ def calculate_deltaR(cell1,cell0):
 		dr = dr.tolist()
 
 		for item in dr:
-			if -1.E-9 < item and item < 1.E-9:
+			if -5.E-7 < item and item < 5.E-7:
 				item = 0.
 			deltaR.append(item)
 
@@ -644,7 +679,7 @@ def calculate_deltaR(cell1,cell0):
 			signtable.append(sign)
 
 	rmsd = np.sqrt(rmsd)
-
+	#print(len(deltaR),len(signtable))
 	return deltaR, signtable, rmsd
 
 

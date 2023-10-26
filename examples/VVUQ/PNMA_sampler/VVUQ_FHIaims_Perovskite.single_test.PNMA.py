@@ -21,6 +21,14 @@ if __name__ == '__main__':
 	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/87_aims_final.in')
 	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/geometry.centric')
 	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveB/local_33/run__fe8h0tno/runs/run_10/geometry.in.next_step')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveA/local_10/run__ta2gwpz6/runs/run_4/geometry.in.next_step')
+	#cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveB/Fsummaray1/410_aims_final.in')
+	#cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveA/Fsummary1/1_aims_final.in')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveA/Fsummary1/5_aims_final.in')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveA/Fsummary1/6_aims_final.in')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveA/Fsummary1/7_aims_final.in')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveA/Fsummary1/9_aims_final.in')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveA/Fsummary1/12_aims_final.in')
 	print('* * * before rotation')
 	print(cell_final.get_lvectors())
 	print(cell_final.get_lconstants())
@@ -63,12 +71,15 @@ if __name__ == '__main__':
 	merged_cluster = merge_clusters(clusters)				# merge Oh clusters into 'merged_cluster'
 
 	cell_final.write_fhiaims(stdout=True)
-	#cell_final.write_xyz(stdout=True)
+	cell_final.write_xyz(stdout=True)
+	print('--- config done')
 	merged_cluster.write_xyz(stdout=True)
 
 	# beta angles
 	#beta_a, beta_b, beta_c = calculate_beta(merged_cluster,C='I',S='Pb')	# beta_x <list:float>[3]
 	beta_a, beta_b, beta_c = calculate_beta_pnma(merged_cluster,C='I',S='Pb')	# beta_x <list:float>[3]
+
+	print(len(beta_a),len(beta_b),len(beta_c))
 
 	# delta d (ddlist)
 	ddlist = calculate_delta_d(clusters,C='Pb',S='I')	# ddlist <list:float>[8]
@@ -81,13 +92,14 @@ if __name__ == '__main__':
 	#	output printing
 	# ======
 
-	#print(lvectors)
+	print('OUTPUT PRINTING -------------------')
+	print(lvectors)
 	print(lconstants)
 	print(langles)
 	print(lvolume)
 	print(beta_a,beta_b,beta_c)
-	#print(ddlist)
-	#print(sslist)
+	print(ddlist)
+	print(sslist)
 
 	#print(deltaR)
 	#print(signtable)
@@ -97,7 +109,7 @@ if __name__ == '__main__':
 	# ======
 	#	FHIaims extractor
 	# ======
-	outpath = '/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/511_aims.out'
+	outpath = '/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveB/Fsummaray1/410_aims.out'
 	ex = extractor()
 	ex.set_output_filepath(outpath)
 
@@ -110,7 +122,7 @@ if __name__ == '__main__':
 	CsE = -215367.565781539
 	IE  = -196591.046250619
 	PbE = -590155.339286194
-	OnsiteE = (CsE + PbE + IE * 3.) * 8.
+	OnsiteE = (CsE + PbE + IE * 3.) * 4.
 
 	ex.set_scf_blocks()
 	fi_e = ex.get_total_energy() - OnsiteE
@@ -124,7 +136,4 @@ if __name__ == '__main__':
 	fhiaims_energy_string = "%18.12f,%18.12f,%18.12f,%18.12f," % (fi_e,fi_hl[0],fi_hl[1],fi_hl[1]-fi_hl[0])
 
 	print(fhiaims_energy_string)
-
-
-
 
