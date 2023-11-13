@@ -21,6 +21,7 @@ if __name__ == '__main__':
 	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveX/Fsummary/87_aims_final.in')
 	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/geometry.centric')
 	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Pnma_sqrt_reduced_cell/Move_Atoms_E1.3/MoveB/local_33/run__fe8h0tno/runs/run_10/geometry.in.next_step')
+	cell_final = read_fhiaims_cell('/work/e05/e05/wkjee/PAX/VVUQ/Perovskite/UQ_CsPbI/Move_Atoms_E0.5.3/MoveA/Fsummary/159_aims_final.in')
 	print('* * * before rotation')
 	print(cell_final.get_lvectors())
 	print(cell_final.get_lconstants())
@@ -60,7 +61,7 @@ if __name__ == '__main__':
 
 	merged_cluster = merge_clusters(clusters)				# merge Oh clusters into 'merged_cluster'
 
-	#cell_final.write_fhiaims(stdout=True)
+	cell_final.write_fhiaims(stdout=True)
 	#cell_final.write_xyz(stdout=True)
 	merged_cluster.write_xyz(stdout=True)
 
