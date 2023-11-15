@@ -159,7 +159,10 @@ class ExtractGULP(GULP_Patterns):
 
 		for line in self.output_file_ptr:
 			if self.OutputConfig['FinalGnorm']['pattern'] in line:
-				gnorm = float(line.strip().split()[self.OutputConfig['FinalGnorm']['loc']-1])
+				try:
+					gnorm = float(line.strip().split()[self.OutputConfig['FinalGnorm']['loc']-1])
+				except:
+					gnorm = 9999.
 				self.output_file_ptr.seek(0)
 
 				if gnorm < gnorm_tol:
