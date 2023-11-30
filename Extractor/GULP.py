@@ -84,6 +84,7 @@ class ExtractGULP(GULP_Patterns):
 		# PARAMETERS
 		self.__gnorm_tol = 1.E-3	# 0.001
 
+		self.abc = 123
 	def reset(self):
 
 		if self.__FileNormal:
