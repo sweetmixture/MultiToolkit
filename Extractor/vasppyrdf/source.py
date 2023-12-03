@@ -27,9 +27,14 @@ rdf_nacl = RadialDistributionFunction(structures=[structure],
                                       indices_i=indices_na, indices_j=indices_cl)
 
 #access  data
-print(rdf_nana.r)
-print(rdf_nana.rdf)
+#print(rdf_nana.r)
+#print(rdf_nana.rdf)
 
-for r,rdf in zip(rdf_nana.r,rdf_nana.rdf):
-	print(r,rdf)
+#for r,rdf in zip(rdf_nana.r,rdf_nana.rdf):
+#	print(r,rdf)
 
+print(len(rdf_nana.r),len(rdf_clcl.r),len(rdf_nacl.r))
+
+for i in range(len(rdf_nana.r)):
+
+	print('%.6f\t%.6f\t%.6f\t%.6f' % (rdf_nana.r[i],rdf_nana.rdf[i],rdf_nacl.rdf[i],rdf_clcl.rdf[i]))

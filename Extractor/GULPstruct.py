@@ -30,7 +30,7 @@ import numpy as np
 from pymatgen.core import Lattice,Structure
 #from Extractor.GULP import GULP_Patterns
 from Extractor.GULP import ExtractGULP
-
+from vasppy.rdf import RadialDistributionFunction
 
 class GULPLattice(ExtractGULP):
 
@@ -82,6 +82,7 @@ class GULPLattice(ExtractGULP):
 								angles:  90.000000  90.000000  90.000000
 								pbc   :       True       True       True
 								Sites (8)
+
 								  #  SP      a    b    c
 								---  ----  ---  ---  ---
 								  0  Mg    0    0    0
@@ -111,11 +112,61 @@ class GULPLattice(ExtractGULP):
 			# BaTiO3=Structure.from_file("BaTiO3.cif")
 			pass
 
+	def get_rdf(self,pair=[None,None]):
+
+		try:
+			indices_A = [ i for i, site in enumerate(self.struct) if site.species_string == pair[0] ]
+			indices_B = [ i for i, site in enumerate(self.struct) if site.species_string == pair[1] ]
+
+			print(indices_A)
+			print(indices_B)
+		except Exception as e:
+			print(f'@Error> in get_rdf(), getting species indices failed -> spcies1: {pair[0]}, species2: {pair[1]}',file=sys.stderr)
+			return False
+
+		# get rdf
+		if pair[0] == pair[1]:
+			rdf = RadialDistributionFunction(structures=[self.struct],indices_i=indices_A)
+		else:
+			rdf = RadialDistributionFunction(structures=[self.struct],indices_i=indices_A,indices_j=indices_B)
+			
+		return rdf.r, rdf.rdf
+
+
 if __name__=='__main__':
 
 	glattice = GULPLattice()
 	glattice.set_lattice('/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/gulp.got')	# upto here, setting pymatgen lattice : member_variable(propery) -> struct
 
+	pair = ['Mg','O']
+	r, rdf = glattice.get_rdf(pair=pair)
+
+	for r, rdf in zip(r,rdf):
+		print(r,rdf)
+
+	glattice.reset()
 
 	# rdf implementation reference : https://vasppy.readthedocs.io/en/latest/examples/rdfs.html
+
+	# trial 2
+	glattice.set_lattice('/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/gulp_klmc.gout')
+	
+	pair = ['Tc','Tc']
+	r0, rdf0 = glattice.get_rdf(pair=pair)
+	pair = ['Li','Tc']
+	r1, rdf1 = glattice.get_rdf(pair=pair)
+	pair = ['Li','Li']
+	r2, rdf2 = glattice.get_rdf(pair=pair)
+
+	glattice.reset()
+
+	print(len(r0))
+	print(len(r1))
+	print(len(r2))
+
+	for i in range(len(r0)):
+		print('%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f' % (r0[i],r1[i],r2[i],rdf0[i],rdf1[i],rdf2[i]))
+
+	
+
 
