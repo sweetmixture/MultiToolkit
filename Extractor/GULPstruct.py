@@ -20,7 +20,7 @@
 
     30.11.2023  : structure extractor back-bone
 
-    using pymatgen / vasppy ?
+	03.12.2023  : RDF calculator -> using pymatgen / vasppy
 
 '''
 
@@ -31,6 +31,19 @@ from pymatgen.core import Lattice,Structure
 #from Extractor.GULP import GULP_Patterns
 from Extractor.GULP import ExtractGULP
 from vasppy.rdf import RadialDistributionFunction
+
+''' function internal use only '''
+#
+# update required ... for normalisation later - 03.12.2023
+#
+def get_gaussian(A,r0,r,sigma):
+	
+	#A = np.float128(A)
+	#r0= np.float128(r0)
+	#r = np.float128(r)
+	#sigma = np.float128(sigma)		
+	return A * np.exp(-(r-r0)*(r-r0)/sigma/sigma)
+
 
 class GULPLattice(ExtractGULP):
 
@@ -70,9 +83,11 @@ class GULPLattice(ExtractGULP):
 							coordlist.append(item[1:])
 							
 						self.struct = Structure(lattice=lvectors,species=specieslist,coords=coordlist)
+						#print('pymatgen lattice.abc:')
 						#print(self.struct.lattice.abc)
+						#print('pymatgen lattice.angles)
 						#print(self.struct.lattice.angles)
-
+						#print('pymatgent lattice')
 						#print(self.struct)
 						'''
 							PossibleOutput
@@ -112,61 +127,97 @@ class GULPLattice(ExtractGULP):
 			# BaTiO3=Structure.from_file("BaTiO3.cif")
 			pass
 
-	def get_rdf(self,pair=[None,None]):
+	def get_rdf(self,pair=[None,None],gaussian=False,smearing=0.05):
 
 		try:
 			indices_A = [ i for i, site in enumerate(self.struct) if site.species_string == pair[0] ]
 			indices_B = [ i for i, site in enumerate(self.struct) if site.species_string == pair[1] ]
-
-			print(indices_A)
-			print(indices_B)
 		except Exception as e:
 			print(f'@Error> in get_rdf(), getting species indices failed -> spcies1: {pair[0]}, species2: {pair[1]}',file=sys.stderr)
-			return False
+			return False, None
 
-		# get rdf
+		# 
+		# Get RadialDistributionFunction -> using vasppy
 		if pair[0] == pair[1]:
 			rdf = RadialDistributionFunction(structures=[self.struct],indices_i=indices_A)
 		else:
 			rdf = RadialDistributionFunction(structures=[self.struct],indices_i=indices_A,indices_j=indices_B)
 			
-		return rdf.r, rdf.rdf
+		#
+		# Using Gaussian smearing ... default smearing factor '0.05'
+		#
+		if gaussian == True:
+
+			gauss_rdf_r = [ float(i)*0.01 for i in range(1000) ] 	# max distance 10 Anstrom ... 
+			gauss_rdf   = [ 0. for i in range(1000) ]
+
+			for index,signal in enumerate(rdf.rdf):
+
+				if signal > 0.:	# case if signal exists
+
+					for gindex,gr in enumerate(gauss_rdf_r):
+
+						ssignal = get_gaussian(signal,rdf.r[index],gr,smearing)
+
+						if ssignal > 10E-12:
+							gauss_rdf[gindex] = gauss_rdf[gindex] + ssignal
+							
+			return gauss_rdf_r, gauss_rdf	
+
+		else:
+			return rdf.r, rdf.rdf
+
 
 
 if __name__=='__main__':
 
+	_smearing = 0.05
+
 	glattice = GULPLattice()
-	glattice.set_lattice('/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/gulp.got')	# upto here, setting pymatgen lattice : member_variable(propery) -> struct
+	glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/gulp.got')	# upto here, setting pymatgen lattice : member_variable(propery) -> struct
 
+	pair = ['Mg','Mg']
+	r0, rdf0 = glattice.get_rdf(pair=pair,gaussian=True,smearing=_smearing)
 	pair = ['Mg','O']
-	r, rdf = glattice.get_rdf(pair=pair)
+	r1, rdf1 = glattice.get_rdf(pair=pair,gaussian=True,smearing=_smearing)
+	pair = ['O','O']
+	r2, rdf2 = glattice.get_rdf(pair=pair,gaussian=True,smearing=_smearing)
 
-	for r, rdf in zip(r,rdf):
-		print(r,rdf)
+	with open(f'MgO.rdf','w') as f:
+		for i in range(len(r0)):
+			f.write('%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f\n' % (r0[i],r1[i],r2[i],rdf0[i],rdf1[i],rdf2[i]))
+			#                                                    r1    r2    r3    MgMg ,   MgO ,  OO
 
 	glattice.reset()
 
 	# rdf implementation reference : https://vasppy.readthedocs.io/en/latest/examples/rdfs.html
 
 	# trial 2
-	glattice.set_lattice('/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/gulp_klmc.gout')
+
+	print('trial 2 ----- MnO2 -----')
+	glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/gulp_klmc.gout')
+	glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/demo_gulp_files/A10753/gulp_klmc.gout')
+	#glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/demo_gulp_files/A15664/gulp_klmc.gout')
 	
+	_smearing = 0.05
+
 	pair = ['Tc','Tc']
-	r0, rdf0 = glattice.get_rdf(pair=pair)
+	r0, rdf0 = glattice.get_rdf(pair=pair,gaussian=True,smearing=_smearing)
 	pair = ['Li','Tc']
-	r1, rdf1 = glattice.get_rdf(pair=pair)
+	r1, rdf1 = glattice.get_rdf(pair=pair,gaussian=True,smearing=_smearing)
 	pair = ['Li','Li']
-	r2, rdf2 = glattice.get_rdf(pair=pair)
+	r2, rdf2 = glattice.get_rdf(pair=pair,gaussian=True,smearing=_smearing)
 
 	glattice.reset()
 
+	print(' ----- lengths ----- ')
 	print(len(r0))
 	print(len(r1))
 	print(len(r2))
 
-	for i in range(len(r0)):
-		print('%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f' % (r0[i],r1[i],r2[i],rdf0[i],rdf1[i],rdf2[i]))
+	with open(f'{sys.argv[1]}','w') as f:
+		for i in range(len(r0)):
+			f.write('%.6f\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f\n' % (r0[i],r1[i],r2[i],rdf0[i],rdf1[i],rdf2[i]))
+			#                                                    r1    r2    r3    TcTc ,  TcLi ,  LiLi
 
-	
-
-
+	# demonstration done ... 03 DEC 2023
