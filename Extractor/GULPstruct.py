@@ -45,12 +45,18 @@ def get_gaussian(A,r0,r,sigma):
 	return A * np.exp(-(r-r0)*(r-r0)/sigma/sigma)
 
 
+
+'''
+	(1) RDF generator
+'''
 class GULPLattice(ExtractGULP):
 
 	def __init__(self):
 		super().__init__()		# load GULP_Patterns
 
 		# ---- overriding default parameters in 'ExtractGULP'	:	using filetype=None
+		# note: class attributes names starting with '__' are not inherited to the child class (?)
+		#
 		self.__FileNormal = False
 		self.__FinishNormal = False
 		self.output_file = None
@@ -65,6 +71,7 @@ class GULPLattice(ExtractGULP):
 
 			if self.set_output_file(filepath):
 				if self.check_finish_normal():
+					# methods from 'ExtractGULP'
 					res1, lvectors = self.get_final_lvectors()
 					res2, lparams  = self.get_final_lparams()
 					res3, fatomlist= self.get_final_frac()
@@ -75,14 +82,15 @@ class GULPLattice(ExtractGULP):
 						#self.lattice = Lattice(lvectors)
 						#print(self.lattice.abc) - lattice length check
 		
-						# extracn species-list coord-list (fractional)
+						# extract species-list coord-list (fractional)
 						specieslist = []
 						coordlist = []
 						for item in fatomlist:
 							specieslist.append(item[0])
 							coordlist.append(item[1:])
-							
+						# pymatgen object 'Structure'(lattice, nosymmetry)
 						self.struct = Structure(lattice=lvectors,species=specieslist,coords=coordlist)
+
 						#print('pymatgen lattice.abc:')
 						#print(self.struct.lattice.abc)
 						#print('pymatgen lattice.angles)
@@ -127,7 +135,15 @@ class GULPLattice(ExtractGULP):
 			# BaTiO3=Structure.from_file("BaTiO3.cif")
 			pass
 
-	def get_rdf(self,pair=[None,None],gaussian=False,smearing=0.05):
+	def get_rdf(self,pair=[None,None],gaussian=False,smearing=0.05,dist=10.0,stride=0.01):
+
+		'''
+			12/2023
+
+			pair(<list[2]<str>>) str -> species name
+			gaussian : bool -> enable gaussian smearing or not
+			smearing : only in effect if gaussian = True
+		'''
 
 		try:
 			indices_A = [ i for i, site in enumerate(self.struct) if site.species_string == pair[0] ]
@@ -148,8 +164,10 @@ class GULPLattice(ExtractGULP):
 		#
 		if gaussian == True:
 
-			gauss_rdf_r = [ float(i)*0.01 for i in range(1000) ] 	# max distance 10 Anstrom ... 
-			gauss_rdf   = [ 0. for i in range(1000) ]
+			_data_points = int(dist/stride)
+
+			gauss_rdf_r = [ float(i)*stride for i in range(_data_points) ] 	# max distance 10 Angstrom - default 
+			gauss_rdf   = [ 0. for i in range(_data_points) ]
 
 			for index,signal in enumerate(rdf.rdf):
 
@@ -196,8 +214,9 @@ if __name__=='__main__':
 
 	print('trial 2 ----- MnO2 -----')
 	glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/gulp_klmc.gout')
-	glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/demo_gulp_files/A10753/gulp_klmc.gout')
-	#glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/demo_gulp_files/A15664/gulp_klmc.gout')
+	#glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/demo_gulp_files/A10753/gulp_klmc.gout')       #
+	glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/demo_gulp_files/n24gm.gout')                  #  Example : LiMnO2 R-phase
+	#glattice.set_lattice('/Users/woongkyujee/SkukuzaLocal/MultiToolkit/Extractor/demo_gulp_files/A15664/gulp_klmc.gout')       #
 	
 	_smearing = 0.05
 
