@@ -105,15 +105,21 @@ if __name__ == '__main__':
 	'''
 	    OnSiteE: path: archer2: /work/e05/e05/wkjee/PAX/VVUQ/Perovskite/FHI22_test/222CsPbX/I/elem 
 
-		Using default FHIaims intermediate	
+		Using default FHIaims really_tight
 
-	    CsE = -215367.565781539
-	    IE  = -196591.046250619
-	    PbE = -590155.339286194
+	    CsE = -215367.602854219
+	    IE  = -196591.046250623
+	    PbE = -590155.339286191
+
+		Using default FHIaims intermediate
+
+		CsE = -215367.565781539
+		IE  = -196591.046250619
+		PbE = -590155.339286194
 	'''
-	CsE = -215367.565781539
-	IE  = -196591.046250619
-	PbE = -590155.339286194
+	CsE = -215367.602854219
+	IE  = -196591.046250623
+	PbE = -590155.339286191
 	OnsiteE = (CsE + PbE + IE * 3.) * 8.
 
 	ex.set_scf_blocks()
