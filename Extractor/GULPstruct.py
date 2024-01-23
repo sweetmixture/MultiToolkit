@@ -20,17 +20,17 @@
 
     30.11.2023  : structure extractor back-bone
 
-	03.12.2023  : RDF calculator -> using pymatgen / vasppy
+    03.12.2023  : RDF calculator -> using pymatgen / vasppy
 
 '''
 
 import os,sys
 import numpy as np
 
-from pymatgen.core import Lattice,Structure
+from pymatgen.core import Lattice,Structure				# using 'pymatgen'
 #from Extractor.GULP import GULP_Patterns
 from Extractor.GULP import ExtractGULP
-from vasppy.rdf import RadialDistributionFunction
+from vasppy.rdf import RadialDistributionFunction		# using 'vasppy'
 
 ''' function internal use only '''
 #
@@ -66,6 +66,21 @@ class GULPLattice(ExtractGULP):
 		self.__gnorm_tol = 1.E-3    # 0.001
 
 	def set_lattice(self,filepath,filetype=None):
+
+		'''
+			Method Description
+
+			(1) read standard gulp output file ( NoSymmetry Lattice )
+
+				* get lattice vectors / * lattice parameters / * factional coordinates of atoms
+
+				>> saved into 'pymatgen' object Structure
+
+			!
+			! 22-01-2024
+			! further developement - supporting reading in gulp 'gin' format / 'cif' format
+			!
+		'''
 
 		if filetype is None:
 
@@ -135,32 +150,65 @@ class GULPLattice(ExtractGULP):
 			# BaTiO3=Structure.from_file("BaTiO3.cif")
 			pass
 
-	def get_rdf(self,pair=[None,None],gaussian=False,smearing=0.05,dist=10.0,stride=0.01):
+	def get_rdf(self,pair=[None,None],gaussian=False,smearing=0.05,dist=10.0,stride=0.01,ifdummy=False):
 
 		'''
 			12/2023
 
-			pair(<list[2]<str>>) str -> species name
+			pair(<list[2]<str>>) str -> species name : e.g. ('Mg','O')
+
 			gaussian : bool -> enable gaussian smearing or not
 			smearing : only in effect if gaussian = True
+
+			* Generating RDF information
+
 		'''
 
 		try:
 			indices_A = [ i for i, site in enumerate(self.struct) if site.species_string == pair[0] ]
 			indices_B = [ i for i, site in enumerate(self.struct) if site.species_string == pair[1] ]
+			#print('ind A:', indices_A)
+			#print('ind B:', indices_B)
 		except Exception as e:
 			print(f'@Error> in get_rdf(), getting species indices failed -> spcies1: {pair[0]}, species2: {pair[1]}',file=sys.stderr)
 			return False, None
 
+		if len(indices_A) == 0 or len(indices_B) == 0:
+			#
+			# no such species -> return dummy : vasppy generated-like empty rdf
+			#
+
+			if gaussian == True:
+				_data_points = int(dist/stride)
+
+				gauss_rdf_r = [ float(i)*stride for i in range(_data_points) ]  # max distance 10 Angstrom - default 
+				gauss_rdf   = [ 0. for i in range(_data_points) ]
+
+				return gauss_rdf_r, gauss_rdf
+
+			else:
+				r_sta = 0.01
+				r_stride = 0.02
+				rlist = []
+				rdflist = []
+
+				r = r_sta
+				while r < 10.0:
+					rlist.append(r)
+					rdflist.append(0.)
+					r += r_stride
+
+				return rlist,rdflist
 		# 
 		# Get RadialDistributionFunction -> using vasppy
+		#
 		if pair[0] == pair[1]:
 			rdf = RadialDistributionFunction(structures=[self.struct],indices_i=indices_A)
 		else:
 			rdf = RadialDistributionFunction(structures=[self.struct],indices_i=indices_A,indices_j=indices_B)
 			
 		#
-		# Using Gaussian smearing ... default smearing factor '0.05'
+		# Using Gaussian smearing ... default smearing factor '0.05': beware surrounding data around peaks will be contaminated
 		#
 		if gaussian == True:
 
