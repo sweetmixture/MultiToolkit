@@ -48,6 +48,7 @@ csvfile = os.path.join(cwd,f'nconp{size}.csv')
 df = pd.read_csv(csvfile)
 #print(df)
 
+# REQUIRE : 'nconp*.csv' + size arguemnts !!!
 
 # ----------------------------------- RDF setting (USERDEF)
 

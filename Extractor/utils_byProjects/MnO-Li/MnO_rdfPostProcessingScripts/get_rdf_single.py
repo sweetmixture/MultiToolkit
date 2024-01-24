@@ -7,6 +7,7 @@ from Extractor.GULPstruct import GULPLattice
 
 # using no smearing
 
+# require only input file !! -> filepath
 cwd = os.getcwd()
 filepath = os.path.join(cwd,sys.argv[1])
 print(filepath)

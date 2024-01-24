@@ -4,9 +4,11 @@
 import sys,os
 from Extractor.GULPstruct import GULPLattice
 
-
-# using no smearing
-
+#
+# inputfile:
+#
+#	(1) 'filepath' : path/to/gulp_periodic(standard3D).output/
+#
 cwd = os.getcwd()
 filepath = os.path.join(cwd,sys.argv[1])
 print(filepath)
