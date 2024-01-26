@@ -150,6 +150,44 @@ class GULPLattice(ExtractGULP):
 			# BaTiO3=Structure.from_file("BaTiO3.cif")
 			pass
 
+		if filetype == 'aims':
+
+			fatomlist = []
+			lvectors = []
+
+			# read lattice vectors
+			with open(filepath,'r') as f:
+
+				for line in f:
+	
+					if 'lattice_vector' in line:
+						vector = []
+
+						ls = line.split()
+						vector.append(float(ls[1]))
+						vector.append(float(ls[2]))
+						vector.append(float(ls[3]))
+
+						lvectors.append(vector)
+
+					if 'atom_frac' in line:
+						atom = []
+
+						ls = line.split()
+						atom = [ls[4], float(ls[1]), float(ls[2]), float(ls[3])]
+						
+						fatomlist.append(atom)
+
+			specieslist = []
+			coordlist = []
+
+			for item in fatomlist:
+				specieslist.append(item[0])
+				coordlist.append(item[1:])
+
+			# pymatgen object 'Structure'(lattice, nosymmetry)
+			self.struct = Structure(lattice=lvectors,species=specieslist,coords=coordlist)
+
 	def get_rdf(self,pair=[None,None],gaussian=False,smearing=0.05,dist=10.0,stride=0.01,ifdummy=False):
 
 		'''

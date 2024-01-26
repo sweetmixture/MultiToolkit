@@ -1,0 +1,80 @@
+#!/bin/python
+
+import pickle
+import sys,os
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter1d
+
+if sys.argv[1] == '-help':
+	print('(1) pklfile\n(2) csvfile')
+	sys.exit(1)
+
+try:
+	pklfile = sys.argv[1]
+	csvfile = sys.argv[2]
+	output_csv = sys.argv[3]
+except:
+	print(' * Err ... one of following inputs missed')
+	print(' (1) pklfile\n(2) csvfile missed')
+
+	sys.exit(1)
+
+# load pkl
+#with open(pklfile,'rb') as f:
+#    rpkl = pickle.load(f)
+pkl_df = pd.read_pickle(pklfile)
+csv_df = pd.read_csv(csvfile)
+
+#taskidlist = csv_df['taskid'].tolist()
+taskidlist = (csv_df['Unnamed: 0'] + 1).tolist()
+
+#plt.plot(r,grdf,label=target_pair,color='green')
+#plt.legend()
+#plt.savefig(f'ave_rdf_{tarset}_{target_pair}.png',bbox_inches='tight')
+#plt.show()
+#sys.exit(1)
+
+pairlist = ['CsCs','CsPb','CsI','PbPb','PbI','II']
+
+def get_rdf(taskidlist,rdf_pkl,pairlist,ouptut_csv):
+
+	result = {}
+	
+	# get 'r'
+	for i, taskid in enumerate(taskidlist):
+		rdf_sample = rdf_pkl[taskid]
+		r = np.array(rdf_sample['r']).tolist()
+		rdf = np.array(rdf_sample[pairlist[0]]).tolist()
+		break
+
+	#r   = np.array([ 0. for i in range(len(r))])
+	#rdf = np.array([ 0. for i in range(len(rdf))])
+	result['r'] = r
+	rdf_len = len(rdf)
+
+	pair_rdf_list = [ np.array([ 0. for i in range(rdf_len)]) for i in range(len(pairlist)) ]
+
+	for i,pair in enumerate(pairlist):
+
+		for taskid in taskidlist:
+			rdf_sample = rdf_pkl[taskid]
+			pair_rdf_list[i] = pair_rdf_list[i] + np.array(rdf_sample[pair])
+
+		pair_rdf_list[i] = pair_rdf_list[i]/float(len(taskidlist))
+
+		result[pair] = pair_rdf_list[i]
+
+	result_df = pd.DataFrame(result)
+	result_df.to_csv(output_csv,index=False)
+
+	return result	# json
+
+rdf = get_rdf(taskidlist,pkl_df,pairlist,output_csv)
+
+# plotting
+
+fig, axes = plt.subplots(3,4)
+
