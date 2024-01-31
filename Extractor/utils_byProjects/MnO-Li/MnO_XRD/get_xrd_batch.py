@@ -64,10 +64,12 @@ df = pd.read_csv(csvfile)
 # -----------------------------------  setting (USERDEF)
 
 # target cif file
-target_file = 'xrd.cif'
+target_file = 'std.cif'
 # global variables
 _wavelength = 1.54059	# Cu Ka generator
 _energy_kev = dif.fc.wave2energy(_wavelength)
+_two_theta_min = 10
+_two_theta_max = 90
 
 # ------ task (xrd generation) mapping
 for taskid in df['taskid'].tolist():
@@ -90,16 +92,30 @@ print(' * ---')
 
 def xrd_process_parallel(arg):
 
+	global _energy_kev
+	global _two_theta_min
+	global _two_theta_max
+
 	taskid, tarfile = arg
 
 	xtl = dif.Crystal(tarfile)
+	xtl.Scatter.setup_scatter(min_twotheta=_two_theta_min, max_twotheta=_two_theta_max,output=False)
 
 	tt, ints, refl = xtl.Scatter.powder('x-ray', units='twotheta', energy_kev=_energy_kev, peak_width=0.01, backgroup=0)
 
 	#
 	#	tt: 2theta, ints: differaction intensity, refl: reflection index -> all numpy.ndarray
 	#
-	return taskid, tt, ints, refl
+
+	# normalise
+	nfactor = np.linalg.norm(ints)
+	ints = ints / nfactor
+
+	# extracting all elements in the first dimension
+	tt = tt[:].tolist()
+	ints = ints[:].tolist()
+
+	return taskid, tt, ints
 
 if mode == '-parallel':
 
@@ -113,9 +129,8 @@ if mode == '-parallel':
 	
 				xrd_element = {}
 				# --------- USER DEF
-				xrd_element['twotheta'] = result[1][0]
-				xrd_element['intensity'] = result[2][0]
-				xrd_element['reflection'] = result[2][5]
+				xrd_element['twotheta'] = result[1]
+				xrd_element['intensity'] = result[2]
 				# --------- USER DEF
 				
 				xrd_summary[result[0]] = xrd_element
@@ -123,6 +138,16 @@ if mode == '-parallel':
 				#           taskid       xrd-data in dic format
 
 				pbar.update(1)
+
+				'''
+					overall :
+
+					xrd_summary = { taskid<int> :
+										{ 'twotheta'<str> : list<float>,
+										  'intensity'<str>: list<float> },
+									...
+								  }
+				'''	
 
 	print(f' * ---')
 	print(f' ! generation done')
