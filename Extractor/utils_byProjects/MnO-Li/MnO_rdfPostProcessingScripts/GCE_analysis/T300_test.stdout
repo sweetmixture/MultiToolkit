@@ -1,0 +1,194 @@
+ ! ------------------------------------------------------------------------
+ ! canonical analysis RDF
+ * freq_path pkl form			 : /work/e05/e05/wkjee/Masters/Zirui2023/MnO/conpshell/freq_pkl
+ * rdf_path  pkl form			 : /work/e05/e05/wkjee/Masters/Zirui2023/MnO/conpshell/rdf_pkl
+ * std_path gulp_std_output(csv) : /work/e05/e05/wkjee/Masters/Zirui2023/MnO/conpshell/rdf_pkl
+ ! Extrating info ...
+ * freq_pkl file check done
+ * rdf_pkl	file check done
+ * std_csv	file check done
+ ! * * *
+ ! starting at  2024-02-07 16:20:22
+Loading gulp stdout csv: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 140.27it/s]
+ - loading at  2024-02-07 16:20:23
+ ! starting at  2024-02-07 16:20:23
+Loading gulp freq pkl: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:07<00:00,  3.37it/s]
+ - loading at  2024-02-07 16:20:30
+ * loading elapsed time : 8.469807863235474 (s)
+ ! ------------------------------------------------------------------------
+ * processing size 0 | data count 1 ...
+ * 0/1 structures with imaginary frequencies were found
+ ! finished
+ * processing size 1 | data count 16933 ...
+ * 226/16933 structures with imaginary frequencies were found
+ ! finished
+ * processing size 2 | data count 15884 ...
+ * 479/15884 structures with imaginary frequencies were found
+ ! finished
+ * processing size 3 | data count 16887 ...
+ * 277/16887 structures with imaginary frequencies were found
+ ! finished
+ * processing size 4 | data count 16792 ...
+ * 243/16792 structures with imaginary frequencies were found
+ ! finished
+ * processing size 5 | data count 16863 ...
+ * 169/16863 structures with imaginary frequencies were found
+ ! finished
+ * processing size 6 | data count 16874 ...
+ * 125/16874 structures with imaginary frequencies were found
+ ! finished
+ * processing size 7 | data count 16965 ...
+ * 164/16965 structures with imaginary frequencies were found
+ ! finished
+ * processing size 8 | data count 17055 ...
+ * 131/17055 structures with imaginary frequencies were found
+ ! finished
+ * processing size 9 | data count 17058 ...
+ * 128/17058 structures with imaginary frequencies were found
+ ! finished
+ * processing size 10 | data count 17181 ...
+ * 139/17181 structures with imaginary frequencies were found
+ ! finished
+ * processing size 11 | data count 17074 ...
+ * 160/17074 structures with imaginary frequencies were found
+ ! finished
+ * processing size 12 | data count 17091 ...
+ * 156/17091 structures with imaginary frequencies were found
+ ! finished
+ * processing size 13 | data count 17131 ...
+ * 160/17131 structures with imaginary frequencies were found
+ ! finished
+ * processing size 14 | data count 17107 ...
+ * 166/17107 structures with imaginary frequencies were found
+ ! finished
+ * processing size 15 | data count 17196 ...
+ * 226/17196 structures with imaginary frequencies were found
+ ! finished
+ * processing size 16 | data count 17130 ...
+ * 278/17130 structures with imaginary frequencies were found
+ ! finished
+ * processing size 17 | data count 17140 ...
+ * 331/17140 structures with imaginary frequencies were found
+ ! finished
+ * processing size 18 | data count 17102 ...
+ * 375/17102 structures with imaginary frequencies were found
+ ! finished
+ * processing size 19 | data count 17011 ...
+ * 460/17011 structures with imaginary frequencies were found
+ ! finished
+ * processing size 20 | data count 17011 ...
+ * 506/17011 structures with imaginary frequencies were found
+ ! finished
+ * processing size 21 | data count 16963 ...
+ * 672/16963 structures with imaginary frequencies were found
+ ! finished
+ * processing size 22 | data count 16886 ...
+ * 971/16886 structures with imaginary frequencies were found
+ ! finished
+ * processing size 23 | data count 16724 ...
+ * 1663/16724 structures with imaginary frequencies were found
+ ! finished
+ * processing size 24 | data count 16445 ...
+ * 3659/16445 structures with imaginary frequencies were found
+ ! finished
+ * reaction energy calculation ... size : 0
+/mnt/lustre/a2fs-work2/work/e05/e05/wkjee/Masters/Zirui2023/MnO/conpshell/rdf_pkl/GrandCanonicalEnsemble/gce_analysis_rdf_inverting_parallel.py:352: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  std_df['energy'] = (std_df['energy'] - _e_gulp_mn2O4 + (_LiOx + _MnRe + _corr) * s )/24.
+ * reaction energy calculation ... size : 1
+ * reaction energy calculation ... size : 2
+ * reaction energy calculation ... size : 3
+ * reaction energy calculation ... size : 4
+ * reaction energy calculation ... size : 5
+ * reaction energy calculation ... size : 6
+ * reaction energy calculation ... size : 7
+ * reaction energy calculation ... size : 8
+ * reaction energy calculation ... size : 9
+ * reaction energy calculation ... size : 10
+ * reaction energy calculation ... size : 11
+ * reaction energy calculation ... size : 12
+ * reaction energy calculation ... size : 13
+ * reaction energy calculation ... size : 14
+ * reaction energy calculation ... size : 15
+ * reaction energy calculation ... size : 16
+ * reaction energy calculation ... size : 17
+ * reaction energy calculation ... size : 18
+ * reaction energy calculation ... size : 19
+ * reaction energy calculation ... size : 20
+ * reaction energy calculation ... size : 21
+ * reaction energy calculation ... size : 22
+ * reaction energy calculation ... size : 23
+ * reaction energy calculation ... size : 24
+ ! ------------------------------------------------------------------------
+ * start ensemble analysis
+ * temperature (K)	   = 300.0
+ * including vibration = False
+ ! ------------------------------------------------------------------------
+ ! size 0 - [G,Z] :8.3332452049965105045e-10 	 0.99999996776556885475
+ ! size 1 - [G,Z] :-0.36018651525423033306 	 1124260.9880468152703
+ ! size 2 - [G,Z] :-0.49337744575273928164 	 194256828.61267841407
+ ! size 3 - [G,Z] :-0.62828906518811165145 	 35874986769.56268148
+ ! size 4 - [G,Z] :-0.763365863600652739 	 6667792704673.405177
+ ! size 5 - [G,Z] :-0.89518587387516124605 	 1092598995347176.0475
+ ! size 6 - [G,Z] :-1.0237614162634206937 	 1.5791916628674033078e+17
+ ! size 7 - [G,Z] :-1.1469536240941691775 	 1.8534157446094523828e+19
+ ! size 8 - [G,Z] :-1.2650208703344201536 	 1.784083957445564955e+21
+ ! size 9 - [G,Z] :-1.3762853719410957873 	 1.3200082577056348079e+23
+ ! size 10 - [G,Z] :-1.4783253348519191262 	 6.835536056232115892e+24
+ ! size 11 - [G,Z] :-1.5728281275561786019 	 2.6445368452476789379e+26
+ ! size 12 - [G,Z] :-1.6536723690044147258 	 6.032163491094937967e+27
+ ! size 13 - [G,Z] :-1.7271174889396503315 	 1.0334674786568289088e+29
+ ! size 14 - [G,Z] :-1.7918528439070337678 	 1.2641625311729631775e+30
+ ! size 15 - [G,Z] :-1.8523916062081077264 	 1.314647619673350011e+31
+ ! size 16 - [G,Z] :-1.9112599048652974049 	 1.28160221901825122355e+32
+ ! size 17 - [G,Z] :-1.9676461676850248855 	 1.1350128413228946247e+33
+ ! size 18 - [G,Z] :-2.024405193131143537 	 1.01978926501379567825e+34
+ ! size 19 - [G,Z] :-2.0781630202408740839 	 8.1583471987849464155e+34
+ ! size 20 - [G,Z] :-2.1311365255240135395 	 6.3316646516861493127e+35
+ ! size 21 - [G,Z] :-2.1814283988383480664 	 4.4298007439268253976e+36
+ ! size 22 - [G,Z] :-2.228584121753817242 	 2.7451461477296467497e+37
+ ! size 23 - [G,Z] :-2.272166578463567145 	 1.4815575270880919194e+38
+ ! size 24 - [G,Z] :-2.306783326739406084 	 5.6526786294512298857e+38
+ ! ------------------------------------------------------------------------
+ * calculation of canonical G / Z done ...
+ ! ------------------------------------------------------------------------
+ * calculating <x> as a function of  at given T : i.e., <x>(u,T)
+ ! ------------------------------------------------------------------------
+ ! chemical pontential configuration
+ ! bin range   : -30000 ~ 20000
+ ! u window(eV): -7.5 ~ 5.0
+ ! delta u     : 0.00025
+ ! ------------------------------------------------------------------------
+ * obtaining particle distribution fuction & expected <x>
+ ! starts  at :  2024-02-07 16:20:44
+ * task preparation done: 50001/50001
+ ! <x>(u) generation: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50001/50001 [00:52<00:00, 959.67task/s]
+ ! ends   at  :  2024-02-07 16:21:38
+ ! elapsed t  : 54.186622858047485
+ ! ------------------------------------------------------------------------
+ * <x>(u,T) inverting .... --> u(<x>,T)
+ ! ------------------------------------------------------------------------
+ ! <x> configuration
+ ! bin range : 1 ~ 2000
+ ! x window  : 0.0005 ~ 1.0
+ ! delta x   : 0.0005
+ ! ------------------------------------------------------------------------
+ * obtaining inverted u(<x>,T)
+ ! starts  at :  2024-02-07 16:21:38
+ * inversion check -> compare to values in x_u_T300.0.out file
+ | rx, ax, u :   1.000000000000e-01  9.998415620933e-02 -3.494500000000e+00 | err_in_x  -1.584379066817e-05
+ | rx, ax, u :   2.000000000000e-01  2.000081670648e-01 -3.117000000000e+00 | err_in_x   8.167064818266e-06
+ | rx, ax, u :   3.000000000000e-01  3.000007181657e-01 -2.816750000000e+00 | err_in_x   7.181657404998e-07
+ | rx, ax, u :   4.000000000000e-01  4.000221167300e-01 -2.406250000000e+00 | err_in_x   2.211673000797e-05
+ | rx, ax, u :   5.000000000000e-01  5.000129027780e-01 -1.910000000000e+00 | err_in_x   1.290277795504e-05
+ | rx, ax, u :   6.000000000000e-01  6.000267788880e-01 -1.579250000000e+00 | err_in_x   2.677888798658e-05
+ | rx, ax, u :   7.000000000000e-01  6.999786707971e-01 -1.388000000000e+00 | err_in_x  -2.132920287037e-05
+ | rx, ax, u :   8.000000000000e-01  7.999469071082e-01 -1.221000000000e+00 | err_in_x  -5.309289178411e-05
+ | rx, ax, u :   9.000000000000e-01  8.999883332108e-01 -9.760000000000e-01 | err_in_x  -1.166678920463e-05
+ | rx, ax, u :   1.000000000000e+00  9.999965452079e-01  5.000000000000e+00 | err_in_x  -3.454792145744e-06
+ ! ends   at  :  2024-02-07 16:21:38
+ ! elapsed t  : 0.19539284706115723
+ ! ------------------------------------------------------------------------
