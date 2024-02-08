@@ -10,14 +10,16 @@ from scipy.ndimage import gaussian_filter1d
 # Example usage
 _T1 = 10
 _T2 = 300
-path1 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/CanonicalEnsemble/RDF_CE_{_T1}K'
-path2 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/CanonicalEnsemble/RDF_CE_{_T2}K'
+
+path1 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/RDF_GCE_T{_T1}'
+path2 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/RDF_GCE_T{_T2}'
 
 _max = 24
 
 #offset = 6
 offset = 12
 sigma = 3
+#sigma = 0.00001
 
 '''
 	color scheme
@@ -87,8 +89,8 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 	for i, file_path in enumerate(file_paths1):
 		# Read data from file
 		with open(file_path, 'r') as file:
-			#data = np.loadtxt(file, skiprows=2)
-			data = np.loadtxt(file)
+			data = np.loadtxt(file, skiprows=1)
+			#data = np.loadtxt(file)
 			x = data[:, 0]
 
 			y1 = data[:, 2]
@@ -136,8 +138,8 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 	for i, file_path in enumerate(file_paths2):
 		# Read data from file
 		with open(file_path, 'r') as file:
-			#data = np.loadtxt(file, skiprows=2)
-			data = np.loadtxt(file)
+			data = np.loadtxt(file, skiprows=1)
+			#data = np.loadtxt(file)
 			x = data[:, 0]
 
 			y1 = data[:, 2]
@@ -198,15 +200,26 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 #file_paths = [ f'RDF_{_T}.0_{i}.rdf' for i in range(_max) ]
 
 # setting path 1
-file_paths1 = [ f'{path1}/RDF_{_T1}.0_{(i+1)*3}.rdf' for i in range(8) ]
-file_paths2 = [ f'{path2}/RDF_{_T2}.0_{(i+1)*3}.rdf' for i in range(8) ]
+#file_paths1 = [ f'{path1}/RDF_{_T1}.0_{(i+1)*3}.rdf' for i in range(8) ]
+#file_paths2 = [ f'{path2}/RDF_{_T2}.0_{(i+1)*3}.rdf' for i in range(8) ]
 
 #for i,path in enumerate(file_paths1):
 #	file_paths1[i] = os.path.join(os.getcwd(),path)
 #for i,path in enumerate(file_paths2):
 #	file_paths2[i] = os.path.join(os.getcwd(),path)
-	
+#file_paths = (file_paths1, file_paths2)
 
+file_paths1 = ['RDF_GCE_10.0_0.125.rdf', 'RDF_GCE_10.0_0.25.rdf', 'RDF_GCE_10.0_0.375.rdf', 'RDF_GCE_10.0_0.5.rdf', 'RDF_GCE_10.0_0.625.rdf',
+            'RDF_GCE_10.0_0.75.rdf', 'RDF_GCE_10.0_0.875.rdf',  'RDF_GCE_10.0_1.0.rdf' ]
+file_paths2 = ['RDF_GCE_300.0_0.125.rdf', 'RDF_GCE_300.0_0.25.rdf', 'RDF_GCE_300.0_0.375.rdf', 'RDF_GCE_300.0_0.5.rdf', 'RDF_GCE_300.0_0.625.rdf',
+            'RDF_GCE_300.0_0.75.rdf', 'RDF_GCE_300.0_0.875.rdf',  'RDF_GCE_300.0_1.0.rdf' ]
+
+for i in range(len(file_paths1)):
+
+	file_paths1[i] = os.path.join(path1,file_paths1[i])
+	file_paths2[i] = os.path.join(path2,file_paths2[i])
+
+	print(file_paths1[i],file_paths2[i])
 file_paths = (file_paths1, file_paths2)
 
 plot_data(file_paths)

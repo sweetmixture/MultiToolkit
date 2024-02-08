@@ -9,16 +9,15 @@ from scipy.ndimage import gaussian_filter1d
 _T   = 10
 _max = 24
 
-offset = 6
 offset = 12
 sigma = 3
 
 '''
 	color scheme
 '''
-c_1 = 'lime'		# LiLi	(3)
-c_2 = 'darkorchid'	# TcTc	(4)
-c_3 = 'slategrey'	# LiTc	(7)
+c_1 = 'lime'    # LiLi	(3)
+c_2 = 'violet'  # TcTc	(4)
+c_3 = 'aqua'    # LiTc	(7)
 
 def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 
@@ -59,6 +58,10 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 		if i == 0:
 			ax.set_ylabel('RDF (a.u.)', fontsize=_fs)
 	
+	axes[0].legend([f'{_T} K'])
+	axes[1].legend([f'{_T} K'])
+	axes[2].legend([f'{_T} K'])
+
 	# ----------------------------------------------------------
 
 	for i, file_path in enumerate(file_paths):
@@ -94,9 +97,18 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 		y_broadened3 = gaussian_filter1d(y_normalised3, sigma=broadening_sigma)
 		
 		# Plot data
-		axes[0].plot(x, y_broadened1 + y_offset, label=file_path, color=c_1)
-		axes[1].plot(x, y_broadened2 + y_offset, label=file_path, color=c_2)
-		axes[2].plot(x, y_broadened3 + y_offset, label=file_path, color=c_3)
+		if i == 0:
+			axes[0].plot(x, y_broadened1 + y_offset, color=c_1, label=f'{_T} K')
+			axes[1].plot(x, y_broadened2 + y_offset, color=c_2, label=f'{_T} K')
+			axes[2].plot(x, y_broadened3 + y_offset, color=c_3, label=f'{_T} K')
+		else:
+			axes[0].plot(x, y_broadened1 + y_offset, color=c_1)
+			axes[1].plot(x, y_broadened2 + y_offset, color=c_2)
+			axes[2].plot(x, y_broadened3 + y_offset, color=c_3)
+
+	axes[0].legend()
+	axes[1].legend()
+	axes[2].legend()
 
 	plt.show()
 
