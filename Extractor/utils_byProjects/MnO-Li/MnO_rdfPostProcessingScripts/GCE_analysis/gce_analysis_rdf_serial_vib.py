@@ -358,7 +358,7 @@ for s, std_df in zip(sizelist,std_dflist):
 
 	if len(std_df) > 10000:
 		#csvdf = csvdf.sample(n=_max_sample, random_state=42)	# use same randseed to keep reproducibility
-		std_df = std_df.head(_max_sample)
+		std_df = std_df.head(10000)
 
 	# Lithiation Reaction Energy converting
 	std_df['energy'] = (std_df['energy'] - _e_gulp_mn2O4 + (_LiOx + _MnRe + _corr) * s )/24.
@@ -604,40 +604,80 @@ for size_x, (std_df,xp) in enumerate(zip(std_dflist,npxlist)):
 	# for 'size_x' get sample-taskid identifier
 	taskidlist = std_df['taskid'].values
 
-	#
-	# looping samples for 'size_x' : s(sample)
-	#
-	for s, (Es,taskid) in enumerate(zip(Elist,taskidlist)):
+	if _include_vib == False:
+		#
+		# looping samples for 'size_x' : s(sample)
+		#
+		for s, (Es,taskid) in enumerate(zip(Elist,taskidlist)):
 
-		print(f" ! working on : {s+1}/{len(taskidlist)}", end='\r')
+			print(f" ! working on : {s+1}/{len(taskidlist)}", end='\r')
 
-		# get sample rdf
-		rdf_s = rdf_df[taskid]
-		# get sample energy
-		Es = np.float128(Es) - Egm
+			# get sample rdf
+			rdf_s = rdf_df[taskid]
+			# get sample energy
+			Es = np.float128(Es) - Egm
+
+			#
+			# looping rdf pairs
+			#
+			for pair in pairlist:
+
+				#
+				# looping rdf intensities
+				#
+				for i, ints in enumerate(rdf_s[pair]):
+
+					rdf_ce_ints[size_x][pair][i] += np.float128(ints) * expkbt(Es,_T)
+
+	if _include_vib == True:
+		#
+		# looping samples for 'size_x' : s(sample)
+		#
+		for s, (Es,taskid) in enumerate(zip(Elist,taskidlist)):
+
+			print(f" ! working on : {s+1}/{len(taskidlist)}", end='\r')
+
+			#
+			# get sample rdf
+			rdf_s = rdf_df[taskid]
+			#
+			# get sample energy
+			Es = np.float128(Es) - Egm
+
+			#
+			# get sample freq
+			freqlist = np.array(freq_dflist[size_x][taskid],dtype=np.float128)
+
+			ZPEs = np.float128(0.)
+			for freq in freqlist:
+				ZPEs += (0.5 * freq * _wavenumber_to_ev)
+
+			# add ZPE correction to the sample energy
+			Es = Es + ZPEs
+
+			#
+			# looping rdf pairs
+			#
+			for pair in pairlist:
+
+				#
+				# looping rdf intensities
+				#
+				for i, ints in enumerate(rdf_s[pair]):
+
+					rdf_ce_ints[size_x][pair][i] += np.float128(ints) * expkbt(Es,_T)
+
 
 		#
-		# looping rdf pairs
+		# multiply exp(xu/kb/T) for all samples
 		#
 		for pair in pairlist:
+			rdf_ce_ints_nptmp = np.array(rdf_ce_ints[size_x][pair]) * np.exp(-Egm/_kb/_T) 
+			rdf_ce_ints[size_x][pair] = rdf_ce_ints_nptmp
 
-			#
-			# looping rdf intensities
-			#
-			for i, ints in enumerate(rdf_s[pair]):
+		del rdf_df
 
-				rdf_ce_ints[size_x][pair][i] += np.float128(ints) * expkbt(Es,_T)
-
-	#
-	# multiply exp(xu/kb/T) for all samples
-	#
-	for pair in pairlist:
-		rdf_ce_ints_nptmp = np.array(rdf_ce_ints[size_x][pair]) * np.exp(-Egm/_kb/_T) 
-		rdf_ce_ints[size_x][pair] = rdf_ce_ints_nptmp
-
-	del rdf_df
-
-	size_end_t = time.time()
+		size_end_t = time.time()
 
 	print(f' ! starts  at   : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(size_start_t)))
 	print(f' ! ends    at   : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(size_end_t)))

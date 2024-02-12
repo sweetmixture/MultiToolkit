@@ -358,7 +358,7 @@ for s, std_df in zip(sizelist,std_dflist):
 
 	if len(std_df) > 10000:
 		#csvdf = csvdf.sample(n=_max_sample, random_state=42)	# use same randseed to keep reproducibility
-		std_df = std_df.head(_max_sample)
+		std_df = std_df.head(10000)
 
 	# Lithiation Reaction Energy converting
 	std_df['energy'] = (std_df['energy'] - _e_gulp_mn2O4 + (_LiOx + _MnRe + _corr) * s )/24.
@@ -524,7 +524,7 @@ current_time = time.time()
 print(f' ! <x> configuration')
 print(f' ! bin range : 1 ~ {_xbin}') 
 print(f' ! x window  : {_dx} ~ {_dx*_xbin}')
-print(f' ! delta x   : {_dx}')
+print(f' ! delta x	 : {_dx}')
 print(f' ! ------------------------------------------------------------------------')
 print(f' * obtaining inverted u(<x>,T)') 
 print(f' ! starts  at : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time)))
@@ -561,9 +561,9 @@ print(f' ! ---------------------------------------------------------------------
 #
 
 task_type = 'RDF'
+gce_start_t = time.time()
 print(f' ! Ensemble Averaging ... task : {task_type}')
-#gce_start_t = time.time()
-#print(f' ! starts  at : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(gce_start_t)))
+print(f' ! starts  at : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(gce_start_t)))
 print(f' ! ------------------------------------------------------------------------')
 # loading RDF 'r' value
 rdf_df = load_pkl(rdf_pkl_paths[0])
@@ -575,6 +575,9 @@ del rdf_df
 # GCE constants
 #
 # need list of <x> and corresponding chemical potentials 'ulist'
+
+# _u = ?
+# _Zg = ?
 
 #
 # prepare gce_rdf saving place - rdf_ce_ints(intensities)
@@ -589,7 +592,6 @@ for i in range(len(rdf_ce_ints)):
 # outer loop : iterating 'x' (or size)
 #
 for size_x, (std_df,xp) in enumerate(zip(std_dflist,npxlist)):
-
 	size_start_t = time.time()
 
 	print(f' * processing {size_x} rdf ...')
@@ -637,45 +639,11 @@ for size_x, (std_df,xp) in enumerate(zip(std_dflist,npxlist)):
 
 	del rdf_df
 
-	size_end_t = time.time()
-
-	print(f' ! starts  at   : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(size_start_t)))
-	print(f' ! ends    at   : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(size_end_t)))
-	print(f' ! time elapsed : {size_end_t - size_start_t}')
-	print(f' * ---------------------------------------------------')
-
-# ------------------------------------------
-# CE rdf done
-#
-# saved in : rdf_ce_ints[size][pair]
-#
-#     size : 0 - 23
-#     pair : 'MnMn','LiLi','TcTc','MnLi','MnTc','LiTc'
-# ------------------------------------------
-
-#
-# writing CE averaged result
-for size_x in sizelist:
-
-	with open(f'RDF_CE_{size_x}_{_T}.rdf','w') as f:
-
-		f.write(f'r ')
-		for pair in pairlist:
-			f.write(f'{pair} ')
-		f.write('\n')
-		
-		for i,r in enumerate(rdf_r):
-
-			f.write('%20.12e' % (r))
-
-			for pair in pairlist:
-				f.write('%20.12e' % (rdf_ce_ints[size_x][pair][i] / npZlist[size_x]))
-			f.write('\n')
-
 #
 # after obtaining CE rdf - summing up for GCE
 #
-# & writing GCE averaged result (u,T)
+# testing
+
 rxlist = [ 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0 ]
 
 for _x in rxlist:
@@ -698,9 +666,6 @@ for _x in rxlist:
 	with open(f'RDF_GCE_{_T}_{_rx}.rdf','w') as f:
 	
 		f.write(f'rx={_rx} ax={_ax} u={_u}\n')
-		# rx : requested 'x'
-		# ax : acutal 'x'
-		# u  : corresponding chemical potential for 'ax'
 	
 		for i,r in enumerate(rdf_r):
 	
@@ -713,11 +678,6 @@ for _x in rxlist:
 
 # GCE end ------------------------------------------------------------------------
 sys.exit()
-
-
-
-
-
 
 for size, std_df in enumerate(std_dflist):
 
