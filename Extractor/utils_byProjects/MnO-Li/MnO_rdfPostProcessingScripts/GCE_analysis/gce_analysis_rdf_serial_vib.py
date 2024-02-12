@@ -668,16 +668,16 @@ for size_x, (std_df,xp) in enumerate(zip(std_dflist,npxlist)):
 					rdf_ce_ints[size_x][pair][i] += np.float128(ints) * expkbt(Es,_T)
 
 
-		#
-		# multiply exp(xu/kb/T) for all samples
-		#
-		for pair in pairlist:
-			rdf_ce_ints_nptmp = np.array(rdf_ce_ints[size_x][pair]) * np.exp(-Egm/_kb/_T) 
-			rdf_ce_ints[size_x][pair] = rdf_ce_ints_nptmp
+	#
+	# multiply exp(xu/kb/T) for all samples
+	#
+	for pair in pairlist:
+		rdf_ce_ints_nptmp = np.array(rdf_ce_ints[size_x][pair]) * np.exp(-Egm/_kb/_T) 
+		rdf_ce_ints[size_x][pair] = rdf_ce_ints_nptmp
 
-		del rdf_df
+	del rdf_df
 
-		size_end_t = time.time()
+	size_end_t = time.time()
 
 	print(f' ! starts  at   : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(size_start_t)))
 	print(f' ! ends    at   : ', time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(size_end_t)))
