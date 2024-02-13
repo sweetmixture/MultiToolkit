@@ -11,8 +11,12 @@ from scipy.ndimage import gaussian_filter1d
 _T1 = 10
 _T2 = 300
 
-path1 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/RDF_GCE_T{_T1}'
-path2 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/RDF_GCE_T{_T2}'
+
+#path1 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/RDF_GCE_T{_T1}'
+#path2 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/RDF_GCE_T{_T2}'
+
+path1 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/vRDF_GCE_T{_T1}'
+path2 = f'/Users/woongkyujee/Desktop/2023SolidSolution/PaperWriting/RDF_Analysis/GCEnsemble/vRDF_GCE_T{_T2}'
 
 _max = 24
 
@@ -192,8 +196,8 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 
 	plt.show()
 
-	fig.savefig(f'rdf_ce_mul.png', dpi=1200, bbox_inches='tight')
-	fig.savefig(f'rdf_ce_mul.pdf', format='pdf', dpi=1200, bbox_inches='tight')
+	fig.savefig(f'v_rdf_ce_mul_{_T1}_{_T2}.png', dpi=1200, bbox_inches='tight')
+	fig.savefig(f'v_rdf_ce_mul_{_T1}_{_T2}.pdf', format='pdf', dpi=1200, bbox_inches='tight')
 
 # ------------------------------------------------------------------------------
 
@@ -209,10 +213,10 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 #	file_paths2[i] = os.path.join(os.getcwd(),path)
 #file_paths = (file_paths1, file_paths2)
 
-file_paths1 = ['RDF_GCE_10.0_0.125.rdf', 'RDF_GCE_10.0_0.25.rdf', 'RDF_GCE_10.0_0.375.rdf', 'RDF_GCE_10.0_0.5.rdf', 'RDF_GCE_10.0_0.625.rdf',
-            'RDF_GCE_10.0_0.75.rdf', 'RDF_GCE_10.0_0.875.rdf',  'RDF_GCE_10.0_1.0.rdf' ]
-file_paths2 = ['RDF_GCE_300.0_0.125.rdf', 'RDF_GCE_300.0_0.25.rdf', 'RDF_GCE_300.0_0.375.rdf', 'RDF_GCE_300.0_0.5.rdf', 'RDF_GCE_300.0_0.625.rdf',
-            'RDF_GCE_300.0_0.75.rdf', 'RDF_GCE_300.0_0.875.rdf',  'RDF_GCE_300.0_1.0.rdf' ]
+file_paths1 = [f'RDF_GCE_{_T1}.0_0.125.rdf', f'RDF_GCE_{_T1}.0_0.25.rdf', f'RDF_GCE_{_T1}.0_0.375.rdf', f'RDF_GCE_{_T1}.0_0.5.rdf', f'RDF_GCE_{_T1}.0_0.625.rdf',
+            f'RDF_GCE_{_T1}.0_0.75.rdf', f'RDF_GCE_{_T1}.0_0.875.rdf',  f'RDF_GCE_{_T1}.0_1.0.rdf' ]
+file_paths2 = [f'RDF_GCE_{_T2}.0_0.125.rdf', f'RDF_GCE_{_T2}.0_0.25.rdf', f'RDF_GCE_{_T2}.0_0.375.rdf', f'RDF_GCE_{_T2}.0_0.5.rdf', f'RDF_GCE_{_T2}.0_0.625.rdf',
+            f'RDF_GCE_{_T2}.0_0.75.rdf', f'RDF_GCE_{_T2}.0_0.875.rdf',  f'RDF_GCE_{_T2}.0_1.0.rdf' ]
 
 for i in range(len(file_paths1)):
 
