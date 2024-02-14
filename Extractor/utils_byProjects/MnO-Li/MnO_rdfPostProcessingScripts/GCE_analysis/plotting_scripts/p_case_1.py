@@ -67,34 +67,26 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 	
 	# font size
 	_fs = 12
-	_lfs = 14
 
-	#axes[0].set_xlabel('$\it{r}$(Li$^{+}$-Li$^{+}$), Å', fontsize=_lfs)
-	#axes[1].set_xlabel('$\it{r}$(Mn$^{3+}$-Mn$^{3+}$), Å', fontsize=_lfs)
-	#axes[2].set_xlabel('$\it{r}$(Mn$^{3+}$-Li$^{+}$), Å', fontsize=_lfs)
-
-	#axes[0].set_xlabel('$\it{r}_\mathrm{Li^{+}Li^{+}}$, ${\AA}$', fontsize=_lfs)
-	axes[0].set_xlabel('$\it{r}_\mathrm{Li^{+}Li^{+}}$, Å', fontsize=_lfs)
-	axes[1].set_xlabel('$\it{r}_\mathrm{Mn^{3+}Mn^{3+}}$, Å', fontsize=_lfs)
-	axes[2].set_xlabel('$\it{r}_\mathrm{Mn^{3+}Li^{+}}$, Å', fontsize=_lfs)
+	axes[0].set_xlabel('Li$^{+}$-Li$^{+}$ (Å)', fontsize=_fs)
+	axes[1].set_xlabel('Mn$^{3+}$-Mn$^{3+}$ (Å)', fontsize=_fs)
+	axes[2].set_xlabel('Mn$^{3+}$-Li$^{+}$ (Å)', fontsize=_fs)
 
 	for i,ax in enumerate(axes):
 		ax.tick_params(axis='x', labelsize=_fs)  # Corrected line
 		#ax.tick_params(axis='y', labelsize=_fs)  # Corrected line
 		ax.set_xlim(1.5, 8.0)
-		ax.set_ylim(-20, 110)
 
 		ax.xaxis.set_major_locator(MultipleLocator(1))
 		ax.xaxis.set_minor_locator(MultipleLocator(0.5))
 
-		# set no yticks - for the rests
 		ax.set_yticks([])
 		if i == 0:
-			ax.set_ylabel('$\it{g}$($\it{r}$), a.u.', fontsize=_lfs+4)
+			ax.set_ylabel('RDF (a.u.)', fontsize=_fs)
 
-	axes[0].legend([f'{_T2} K'],fontsize=_fs)
-	axes[1].legend([f'{_T2} K'],fontsize=_fs)
-	axes[2].legend([f'{_T2} K'],fontsize=_fs)
+	axes[0].legend([f'{_T2} K'])
+	axes[1].legend([f'{_T2} K'])
+	axes[2].legend([f'{_T2} K'])
 	
 	# ----------------------------------------------------------
 	# plotting - 1
@@ -123,7 +115,6 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 	   
 		# Apply offset to y values
 		y_offset = i * offset
-		print(i,offset,y_offset)
 		
 		# Apply Gaussian broadening to y values
 		#y_broadened = gaussian_filter1d(y, sigma=broadening_sigma)
@@ -133,9 +124,9 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 		
 		# Plot data
 		if i == 0:
-			axes[0].plot(x, y_broadened1 + y_offset - 15, color=c_1, label=f'{_T1} K')
-			axes[1].plot(x, y_broadened2 + y_offset - 15, color=c_2, label=f'{_T1} K')
-			axes[2].plot(x, y_broadened3 + y_offset - 15, color=c_3, label=f'{_T1} K')
+			axes[0].plot(x, y_broadened1 + y_offset, color=c_1, label=f'{_T1} K')
+			axes[1].plot(x, y_broadened2 + y_offset, color=c_2, label=f'{_T1} K')
+			axes[2].plot(x, y_broadened3 + y_offset, color=c_3, label=f'{_T1} K')
 		else:
 			axes[0].plot(x, y_broadened1 + y_offset, color=c_1)
 			axes[1].plot(x, y_broadened2 + y_offset, color=c_2)
@@ -183,9 +174,9 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 
 		# Plot data
 		if i == 0:
-			axes[0].plot(x, y_broadened1 + y_offset - 15, color=c_11, linestyle='--', label=f'{_T2} K')
-			axes[1].plot(x, y_broadened2 + y_offset - 15, color=c_22, linestyle='--', label=f'{_T2} K')
-			axes[2].plot(x, y_broadened3 + y_offset - 15, color=c_33, linestyle='--', label=f'{_T2} K')
+			axes[0].plot(x, y_broadened1 + y_offset, color=c_11, linestyle='--', label=f'{_T2} K')
+			axes[1].plot(x, y_broadened2 + y_offset, color=c_22, linestyle='--', label=f'{_T2} K')
+			axes[2].plot(x, y_broadened3 + y_offset, color=c_33, linestyle='--', label=f'{_T2} K')
 		else:
 			axes[0].plot(x, y_broadened1 + y_offset, color=c_11, linestyle='--')
 			axes[1].plot(x, y_broadened2 + y_offset, color=c_22, linestyle='--')
@@ -197,9 +188,9 @@ def plot_data(file_paths, offset=offset, broadening_sigma=sigma):
 		#	axes[2].legend([f'{_T2} K'])
 
 	#plt.legend()	# as done as 'label' in plot()
-	axes[0].legend(fontsize=_fs)
-	axes[1].legend(fontsize=_fs)
-	axes[2].legend(fontsize=_fs)
+	axes[0].legend()
+	axes[1].legend()
+	axes[2].legend()
 
 	fig.show()
 
@@ -235,5 +226,4 @@ for i in range(len(file_paths1)):
 	print(file_paths1[i],file_paths2[i])
 file_paths = (file_paths1, file_paths2)
 
-plot_data(file_paths, offset=offset, broadening_sigma=sigma)
-
+plot_data(file_paths)
