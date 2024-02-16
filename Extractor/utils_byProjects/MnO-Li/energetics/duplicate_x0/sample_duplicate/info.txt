@@ -1,0 +1,8 @@
+# 16.02.24
+
+	scripts in this directory is for duplicating x=0 samples in order to remove noise at the x=0 boundary.
+
+
+		1. 'duplicate_nconp.py' only for n=0 (or x=0) to duplicate GM sample
+
+		2. 'duplicate_freq_txtTOpkl.py' only for n=0 (or x=0) to duplicate GM sample frequencies
