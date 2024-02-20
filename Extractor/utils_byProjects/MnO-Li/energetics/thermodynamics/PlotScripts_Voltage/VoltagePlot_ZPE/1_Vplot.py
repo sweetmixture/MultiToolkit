@@ -1,0 +1,113 @@
+#!/bin/python3
+
+import sys
+import numpy as np
+import pandas as pd
+from math import factorial as fact
+
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
+
+filelist = ['v10.out','v100.out','v200.out','v300.out','ExpData.out','abinitio.out'  ]
+#filelist = ['p10.out','p100.out','p200.out','p300.out','ExpData.out','abinitio.out'  ]
+
+
+'''
+	plot config
+'''
+cm = 1/2.54
+fig, ax = plt.subplots()
+fig.set_size_inches((16*cm,12*cm))
+
+plt.subplots_adjust(
+left = 0.125,
+bottom = 0.125,
+right = 0.96,
+top = 0.96,
+wspace = 0.200,
+hspace = 0.0
+)
+
+# font size
+_fs = 12
+_lfs = 14
+
+#
+ax.set_xlabel('$\it x$', fontsize=_lfs)
+
+ax.tick_params(axis='x', labelsize=_fs)  # Corrected line
+ax.tick_params(axis='y', labelsize=_fs)  # Corrected line
+ax.set_xlim(0., 1.)
+ax.set_ylim(0.0,5.4)
+#ax.set_ylim(0.6,4.2)
+ax.xaxis.set_major_locator(MultipleLocator(0.1))
+ax.xaxis.set_minor_locator(MultipleLocator(0.05))
+ax.yaxis.set_major_locator(MultipleLocator(0.5))
+ax.yaxis.set_minor_locator(MultipleLocator(0.25))
+
+# set no yticks - for the rests
+#ax.set_yticks([])
+ax.set_ylabel('$\it V$ (vs. Li/Li$^+$)', fontsize=_lfs)
+#ax.set_ylabel('V (vs. Li/Li^+)', fontsize=_lfs+4)
+
+
+#clist = ['silver','lightcoral','black','bisque','lime','khaki','peachpuff','aqua','plum']
+#clist = ['gray','indianred','orange','forestgreen','gold','chocolate','steelblue','mediumpurple']
+#clist = ['gray','indianred','orange','black','gold','chocolate','steelblue','mediumpurple']
+#clist = ['steelblue','lightcoral','black','lime','khaki','peachpuff','aqua','plum']
+#clist = ['indianred','orange','mediumpurple','lime','black','forestgreen','chocolate','steelblue','mediumpurple']
+
+#clist = ['steelblue','orange','red','black','gray']
+#clist = ['royalblue','mediumpurple','deeppink','red','black','gray']
+clist = ['royalblue','orange','blue','red','black','gray']
+clist = ['teal','orange','blue','red','black','gray']
+#clist = ['comflowerblue','mediumpurple','orange','red','black','gray']
+
+# plot
+for i,file_path in enumerate(filelist):
+
+	with open(file_path,'r') as file:
+
+		data = np.loadtxt(file,skiprows=1)
+
+		if i < 4:
+			x = data[:,0]
+			y = data[:,2]
+		else:
+			x = data[:,0]
+			y = data[:,1]
+
+		#if i == 4:
+		#	ax.plot(x,y, color=clist[i], linestyle='--', label=f'{sizelist[i]}')
+		#else:
+		#	ax.plot(x,y, color=clist[i], label=f'{sizelist[i]}')
+		if i == 0:
+			#ax.plot(x,y, color=clist[i], label=f'10K$^a$')
+			ax.plot(x,y, color=clist[i], label=f'10K')
+		if i == 1:
+			#ax.plot(x,y, color=clist[i], label=f'100K$^a$')
+			ax.plot(x,y, color=clist[i], label=f'100K')
+		if i == 2:
+			#ax.plot(x,y, color=clist[i], label=f'300K$^a$')
+			ax.plot(x,y, color=clist[i], label=f'200K')
+		if i == 3:
+			#ax.plot(x,y, color=clist[i], label=f'300K$^a$')
+			ax.plot(x,y, color=clist[i], label=f'300K')
+		if i == 4:
+			ax.plot(x,y, color=clist[i], label=f'Exp.$^a$')
+		if i == 5:
+			ax.plot(x,y, color=clist[i], label=f'DFT$^a$')
+
+	ax.legend(fontsize=_fs-2)
+	# Add legend outside the graph
+	#ax.legend(fontsize=_fs-3.5, bbox_to_anchor=(1.05, 1), loc='upper left')
+
+
+# add reference line
+#ax.axvline(x=1./24., color='red', linestyle=':', label='Reference line')
+#ax.axvline(x=23./24., color='blue', linestyle='--', label='Reference line')
+
+fig.savefig(f'VoltageProfile.png', dpi=1200, bbox_inches='tight')
+fig.savefig(f'VoltageProfile.pdf', format='pdf', dpi=1200, bbox_inches='tight')
+
+plt.show()

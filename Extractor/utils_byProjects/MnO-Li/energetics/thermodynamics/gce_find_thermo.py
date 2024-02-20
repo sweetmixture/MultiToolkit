@@ -561,10 +561,14 @@ for _T in _Tfb:
 # end after printing x, u, -u
 
 
+# USER : MUST USE kJ
+_unitJ = True
 #
 #	free E : G(x,T) calculator
 #
 def get_gasx(_T):
+
+	global _unitJ
 
 	_file = f'x_u_T{_T}.out'
 
@@ -578,6 +582,10 @@ def get_gasx(_T):
 
 
 	of = open(f'x_g_T{_T}.out','w')
+	if _unitJ == True:
+		of.write('%20s  %20s\n' % ('x','G(J/mol)'))
+	else:
+		of.write('%20s  %20s\n' % ('x','G(eV)'))
 	#
 	# integate for x [0:x]
 	#
@@ -595,7 +603,11 @@ def get_gasx(_T):
 		int_xrange = xlist[:k+2]
 		int_yrange = ulist[:k+2]
 
-		I = np.trapz(int_yrange,int_xrange)
+		if _unitJ == True:
+			I = np.trapz(int_yrange,int_xrange) * 96491.5666
+		else:
+			I = np.trapz(int_yrange,int_xrange)
+			
 		of.write('%20.12e  %20.12e\n' % (int_xrange[-1],I))
 
 		retilist.append(np.float128(I))
@@ -640,15 +652,19 @@ def get_gval(p1,p2,x):
 	return a * x + b
 
 # USER
-_unitJ = True
-#_dsx = 0.05
 _dsx = 0.01
 #
 sxlist = [ float(i+1)*_dsx for i in range(int(1./_dsx)-1) ]		# warning -> must exclude boundary x = 0 and 1
-of = open(f'ST{_Tc}_d{_dT}.out','w')
+
+of = open(f'HST{_Tc}_d{_dT}.out','w')
+if _unitJ == True:
+	of.write('%20s  %20s  %20s %20s\n' % ('x','G(kJ/mol)','H(kJ/mol)','S(J/mol/K)'))
+else:	
+	of.write('%20s  %20s  %20s %20s\n' % ('x','G(eV)','H(eV)','S(eV/K)'))
+
 
 print(f' ! ------------------------------------------------------------------------')
-print(f' * printing entropy')
+print(f' * printing enthalpy, entropy')
 print(f' ! T       = {_Tc} K')
 print(f' ! delta T = {_dT} K used for numerical calculation')
 print(f' ! delta x = {_dsx} for {int(1./_dsx)} data points')
@@ -676,12 +692,18 @@ for x in sxlist:
 
 	# caclulate entropy 's' with central difference method
 
-	if _unitJ == True:
-		s = - (fg - bg) / 2. / _dT * 96491.5666
-	else:
-		s = - (fg - bg) / 2. / _dT
+	#if _unitJ == True:
+	#	s = - (fg - bg) / 2. / _dT * 96491.5666
+	#else:
+	#	s = - (fg - bg) / 2. / _dT
 
-	of.write('%20.12e  %20.12e\n' % (x,s))
+	# units are in J
+	s = - (fg - bg) / 2. / _dT
+	g = (fg + bg) / 2.	
+	h = g + s * _Tc
+
+	# J -> kJ for G and H
+	of.write('%20.12e  %20.12e	%20.12e  %20.12e\n' % (x,g/1000.,h/1000.,s))
 
 of.close()
 

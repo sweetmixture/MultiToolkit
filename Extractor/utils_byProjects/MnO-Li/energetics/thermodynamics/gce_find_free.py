@@ -552,11 +552,14 @@ print(f' ! ---------------------------------------------------------------------
 
 # end after printing x, u, -u
 
-
+# USER
+_unitJ = True
 #
 #	free E : G(x,T) calculator
 #
 def get_gasx(_T):
+
+	global _unitJ
 
 	_file = f'x_u_T{_T}.out'
 
@@ -564,12 +567,16 @@ def get_gasx(_T):
 
 		data = np.loadtxt(f,skiprows=1,dtype=np.float128)
 
-		xlist  = data[:,0]  # col 1
-		ulist  = data[:,1]  # col 2
+		xlist  = data[:,0]	# col 1
+		ulist  = data[:,1]	# col 2
 		#_ulist = data[:,2]  # col 3
 
 
 	of = open(f'x_g_T{_T}.out','w')
+	if _unitJ == True:
+		of.write('%20s  %20s\n' % ('x','G(J/mol)'))
+	else:
+		of.write('%20s  %20s\n' % ('x','G(eV)'))
 	#
 	# integate for x [0:x]
 	#
@@ -583,7 +590,10 @@ def get_gasx(_T):
 		int_xrange = xlist[:k+2]
 		int_yrange = ulist[:k+2]
 
-		I = np.trapz(int_yrange,int_xrange)
+		if _unitJ == True:
+			I = np.trapz(int_yrange,int_xrange) * 96491.5666
+		else:
+			I = np.trapz(int_yrange,int_xrange)
 
 		of.write('%20.12e  %20.12e\n' % (int_xrange[-1],I))
 
