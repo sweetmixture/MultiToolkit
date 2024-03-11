@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 filelist = ['v10.out','v100.out','v200.out','v300.out','ExpData.out','abinitio.out'  ]
-#filelist = ['v10.out','v100.out','v200.out','v300.out','ExpData2.out','abinitio.out'  ]
+filelist = ['v10.out','v100.out','v200.out','v300.out','ExpData2.out','abinitio.out'  ]
+filelist = ['v10.out','v200.out','v300.out','ExpData.out','ExpData2.out','ExpData3.out','abinitio.out'  ]
 #filelist = ['p10.out','p100.out','p200.out','p300.out','ExpData.out','abinitio.out'  ]
 
 
@@ -60,8 +61,9 @@ ax.set_ylabel('$\it V$ (vs. Li/Li$^+$)', fontsize=_lfs)
 
 #clist = ['steelblue','orange','red','black','gray']
 #clist = ['royalblue','mediumpurple','deeppink','red','black','gray']
-clist = ['royalblue','orange','blue','red','black','gray']
-clist = ['teal','orange','blue','red','black','gray']
+#clist = ['royalblue','orange','blue','red','black','gray']
+#clist = ['teal','orange','blue','red','black','dimgray','gray']
+clist = ['teal','blue','red','dimgrey','black','darkgray','blueviolet']
 #clist = ['comflowerblue','mediumpurple','orange','red','black','gray']
 
 # plot
@@ -71,7 +73,7 @@ for i,file_path in enumerate(filelist):
 
 		data = np.loadtxt(file,skiprows=1)
 
-		if i < 4:
+		if i < 3:
 			x = data[:,0]
 			y = data[:,2]
 		else:
@@ -86,17 +88,18 @@ for i,file_path in enumerate(filelist):
 			#ax.plot(x,y, color=clist[i], label=f'10K$^a$')
 			ax.plot(x,y, color=clist[i], label=f'10K')
 		if i == 1:
-			#ax.plot(x,y, color=clist[i], label=f'100K$^a$')
-			ax.plot(x,y, color=clist[i], label=f'100K')
-		if i == 2:
 			#ax.plot(x,y, color=clist[i], label=f'300K$^a$')
 			ax.plot(x,y, color=clist[i], label=f'200K')
-		if i == 3:
+		if i == 2:
 			#ax.plot(x,y, color=clist[i], label=f'300K$^a$')
 			ax.plot(x,y, color=clist[i], label=f'300K')
-		if i == 4:
+		if i == 3:
 			ax.plot(x,y, color=clist[i], label=f'Exp.$^a$')
+		if i == 4:
+			ax.plot(x,y, color=clist[i], label=f'Exp.$^b$')
 		if i == 5:
+			ax.plot(x,y, color=clist[i], label=f'Exp.$^c$')
+		if i == 6:
 			ax.plot(x,y, color=clist[i], label=f'DFT$^a$')
 
 	ax.legend(fontsize=_fs-2)
@@ -108,7 +111,7 @@ for i,file_path in enumerate(filelist):
 #ax.axvline(x=1./24., color='red', linestyle=':', label='Reference line')
 #ax.axvline(x=23./24., color='blue', linestyle='--', label='Reference line')
 
-fig.savefig(f'VoltageProfile1.png', dpi=1200, bbox_inches='tight')
-fig.savefig(f'VoltageProfile1.pdf', format='pdf', dpi=1200, bbox_inches='tight')
+fig.savefig(f'VoltageProfile3.png', dpi=1200, bbox_inches='tight')
+fig.savefig(f'VoltageProfile3.pdf', format='pdf', dpi=1200, bbox_inches='tight')
 
 plt.show()

@@ -1,9 +1,28 @@
-#!/bin/bash
+# 03.2024 W.JEE
+# KLMC Solid Soultion
+#
+# this script collect general information from task-farming GULP run : should be used for final result production 
+#
+# !!! TO USE THIS SCRIPT, YOU MUST INSTALL ;https://github.com/sweetmixture/MultiToolkit.git;
+#
+# ! as a result of this script, you will get a 'csv' file that can be further used for : 'rdf'/'xrd' simulations
+# ! result csv file will contain ...
+#   lattice parameters : a,b,c,alp,beta,gamma,volume,bulkmod,compressibility,dielectric constants
+#
+# > 'RDF' radial distribution function - see :
+# > 'XRD' X-ray diffraction simulations- see :
+#
 
 from Extractor.GULP import ExtractGULP
 from concurrent.futures import ProcessPoolExecutor
 import os,sys
 import pandas as pd
+
+# USER DEFINE ----
+_csv_filename = 'summary.csv' # final csv file name (saving results)
+_max_threads = 32 # number of cpus to use
+_max_value = 100 # ending output tag (number of GULP outputs to extract, e.g., A0 ~ A${_max_value})
+# USER DEFINE ----
 
 def get_gulp_output(fname,__gtol):
 
@@ -98,7 +117,7 @@ def get_gulp_output(fname,__gtol):
 
 if __name__ == '__main__':
 
-	_MAX_ITEM = 1
+	_MAX_ITEM = _max_value
 
 	dir_path = os.getcwd()	#sys.argv[1]	# only req input parameter -> summary directory path abs
 	#dir_path = sys.argv[1]	# only req input parameter -> summary directory path abs
@@ -191,7 +210,7 @@ if __name__ == '__main__':
 			return None
 
 	results = []
-	with ProcessPoolExecutor(max_workers=32) as executor:
+	with ProcessPoolExecutor(max_workers=_max_threads) as executor:
 		#results = list(executor.map(process_file,range(_MAX_ITEM)))
 		#print(f"Processed {len(results)} out of {_MAX_ITEM} directories ({len(results) / _MAX_ITEM * 100:.2f}% complete).")
 
@@ -208,7 +227,8 @@ if __name__ == '__main__':
 	df.set_index('energy',inplace=True)
 	df = df.sort_values(by='energy',ascending=True)
 
-	df.to_csv(sys.argv[1])
+	#df.to_csv(sys.argv[1])
+	df.to_csv(f'{_csv_filename}')
 
 	print(df)
 

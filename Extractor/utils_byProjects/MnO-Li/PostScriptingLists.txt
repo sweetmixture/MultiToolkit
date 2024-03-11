@@ -1,0 +1,8 @@
+MnO_freqPostProcessingScripts:
+get_freq_byTaskid.py  get_freqs.sh
+
+MnO_PostProcessingScripts:
+PoolGULPEx.py
+
+MnO_PreperationPhaseScripts:
+Conv  CoreOnly

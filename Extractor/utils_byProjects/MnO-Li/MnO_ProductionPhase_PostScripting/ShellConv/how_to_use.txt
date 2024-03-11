@@ -1,0 +1,9 @@
+# 03.2024 W.Jee
+
+(1) KLMC_SS_Screening.sh    : screening failed calculations (with high gnorm values)
+(2) KLMC_SS_ConvToConp.py   : using geometries of previous step calculations, converting them into any desired new GULP inpur format
+
+!
+! (2) KLMC_SS_ConvToConp.py has dependency on (1) KLMC_SS_Screening.sh
+!
+

@@ -391,7 +391,7 @@ print(f' ! ---------------------------------------------------------------------
 _Tc = _T
 # VERY IMPORTANT USER PARAMETER : SETTING delta T for central difference method to calculate 'S'
 #_dT = 0.025
-_dT = 0.5
+_dT = 1.0
 _Tf = _T + _dT
 _Tb = _T - _dT
 _Tfb = [_Tf,_Tb]
@@ -562,9 +562,32 @@ for _T in _Tfb:
 
 
 # USER : MUST USE kJ
+# use trapz integration
 _unitJ = True
 #
-#	free E : G(x,T) calculator
+#	calculting dΔG(x,T)/dx calculator
+#
+def get_dgasx(_T):
+
+	global _unitJ
+
+	_file = f'x_u_T{_T}.out'
+
+	with open(_file,'r') as f:
+
+		data = np.loadtxt(f,skiprows=1,dtype=np.float128)
+
+		xlist = data[:,0]	# x 
+		vlist = data[:,1]	# chemical_potential (u)
+
+	if _unitJ == True:
+		for k,v in enumerate(vlist):
+			vlist[k] = v * 96485.3321
+
+	return xlist, vlist
+
+#
+#   calculating ΔG(x,T)
 #
 def get_gasx(_T):
 
@@ -604,7 +627,7 @@ def get_gasx(_T):
 		int_yrange = ulist[:k+2]
 
 		if _unitJ == True:
-			I = np.trapz(int_yrange,int_xrange) * 96491.5666
+			I = np.trapz(int_yrange,int_xrange) * 96485.3321 # V
 		else:
 			I = np.trapz(int_yrange,int_xrange)
 			
@@ -620,6 +643,9 @@ def get_gasx(_T):
 # --------------------------------------------------------
 xflist,gflist = get_gasx(_Tf)
 xblist,gblist = get_gasx(_Tb)
+
+xflist,vflist = get_dgasx(_Tf)
+xblist,vblist = get_dgasx(_Tb)
 
 print(f' * front/backward free energy ready ...')
 
@@ -653,14 +679,15 @@ def get_gval(p1,p2,x):
 
 # USER
 _dsx = 0.01
+_dsx = 0.0025
 #
 sxlist = [ float(i+1)*_dsx for i in range(int(1./_dsx)-1) ]		# warning -> must exclude boundary x = 0 and 1
 
 of = open(f'HST{_Tc}_d{_dT}.out','w')
 if _unitJ == True:
-	of.write('%20s  %20s  %20s %20s\n' % ('x','G(kJ/mol)','H(kJ/mol)','S(J/mol/K)'))
+	of.write('%20s  %20s  %20s %20s\n' % ('x','ΔG(kJ/mol)','ΔH(kJ/mol)','ΔS(J/mol/K)'))
 else:	
-	of.write('%20s  %20s  %20s %20s\n' % ('x','G(eV)','H(eV)','S(eV/K)'))
+	of.write('%20s  %20s  %20s %20s\n' % ('x','ΔG(eV)','ΔH(eV)','ΔS(eV/K)'))
 
 
 print(f' ! ------------------------------------------------------------------------')
@@ -708,3 +735,36 @@ for x in sxlist:
 of.close()
 
 
+of = open(f'dHST{_Tc}_d{_dT}.out','w')
+if _unitJ == True:
+	of.write('%20s  %20s  %20s %20s\n' % ('x','dΔG/dx(kJ/mol)','dΔH/dx(kJ/mol)','dΔS/dx(J/mol/K)'))
+else:	
+	of.write('%20s  %20s  %20s %20s\n' % ('x','dΔG/dx(eV)','dΔH/dx(eV)','dΔS/dx(eV/K)'))
+
+for x in sxlist:
+
+	# front V
+	fksta, fkend = get_near_indices(xflist,x)
+	fx1 = xflist[fksta]
+	fx2 = xflist[fkend]
+	fv1 = vflist[fksta]
+	fv2 = vflist[fkend]
+	# get fv for 'x'
+	fv = get_gval((fx1,fv1),(fx2,fv2),x)
+
+	# backward V
+	bksta, bkend = get_near_indices(xblist,x)
+	bx1 = xblist[bksta]
+	bx2 = xblist[bkend]
+	bv1 = vblist[bksta]
+	bv2 = vblist[bkend]
+	# get bv for 'x'
+	bv = get_gval((bx1,bv1),(bx2,bv2),x)
+
+	# units are in J
+	ds = - (fv - bv) / 2. / _dT		# 
+	dg = (fv + bv) / 2.	
+	dh = dg + ds * _Tc
+
+	# J -> kJ for G and H
+	of.write('%20.12e  %20.12e	%20.12e  %20.12e\n' % (x,dg/1000.,dh/1000.,ds))

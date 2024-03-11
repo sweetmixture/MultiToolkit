@@ -1,0 +1,7 @@
+# 03.2024 W.Jee
+
+(1) KLMC_PoolGulpEx.py           : generating a csv file that summarise some useful informations from KLMC-taskfarm production run
+
+!
+! please read further description in 'KLMC_PoolGulpEx.py'
+!

@@ -1,0 +1,4 @@
+# 11.03.2024
+plotting and checking the effect of x = 0 samples ..
+
+where at x = 0 -> using duplicated samples for entropic effect : see 'duplicate' directory
