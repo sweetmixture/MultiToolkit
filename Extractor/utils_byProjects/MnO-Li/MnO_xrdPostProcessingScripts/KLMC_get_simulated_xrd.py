@@ -176,7 +176,7 @@ if mode == '-parallel':
 	print(f' * ---')
 	print(f' ! generation done')
 	print(f' * ---')
-	print(f' ! writing pkl : xrd{size}.pkl')
+	print(f' ! writing pkl : {_xrd_output_summary}')
 	print(f' * ---')
 
 	with open(f'{_xrd_output_summary}','wb') as f:
