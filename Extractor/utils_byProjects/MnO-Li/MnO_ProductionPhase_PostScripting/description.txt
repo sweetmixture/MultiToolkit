@@ -3,16 +3,41 @@
 #
 #   KLMC Solid Solution: scripts for production phase
 #
+#   IMPORTANT: Most of the python scripts listed in this document are assumed to be used in multi-threading environment ( tested on ARCHER 2 )
+#
+!   * Directories |
 !
-!   CoreConv   : supporting post-processing core-conv calculations 
-!   ShellConv  : supporting post-processing shel-conv calculations
+!   /MnO-Li/MnO_ProductionPhase_PostScripting/CoreConv      : supporting post-processing for 'core-conv' calculations 
 !
-!   ShellConp  : typically shell-conp is the final phase calculation, in the directory, script 'KLMC_PoolGulpEx.py' is to summarise results in csv format
-!   * generated 'csv' file is a standard form that could be used for further analysis:
-!        (1) Freqeuncy analysis
-!        (2) Radial distribution function
-!        (3) X-ray diffraction simulations
-!   * therefore, if further analysis is necessary, it is convenient to keep it !
+!   /MnO-Li/MnO_ProductionPhase_PostScripting/ShellConv     : supporting post-processing for 'shel-conv' calculations
+!
+!   /MnO-Li/MnO_ProductionPhase_PostScripting/ShellConp     : typically shell-conp is the final phase calculation, in this directory, script 'KLMC_PoolGulpEx.py' is to summarise results in csv format
+!   * to use this script, must install 'Multitoolkit' python pacakge: https://github.com/sweetmixture/MultiToolkit.git
+!
+!     Expected outputs
+!     * generated 'csv' file : a standard form that could be used for further analysis
+!     ㄴ(1) Freqeuncy analysis
+!           
+!        * see /MnO-Li/MnO_freqPostProcessingScripts
+!               KLMC_get_freq_by_taskid.py      : summarise frequencies in human readable format
+!               KLMC_convert_freq_to_pickle.py  : converet the summarised frequencies to binary pickle format for later use      
+!
+!        * misics
+!               check_freq_pkl.py       : tool for checking pickle file -> read 'pkl' file and print frequencies recored for requested 'taskid'
+!
+!     ㄴ(2) Radial distribution function
+!
+!     ㄴ(3) X-ray diffraction simulations
+!
+!        * see /MnO-Li/MnO_xrdPostProcessingScripts
+!               KLMC_convert_gulp_cif_to_standard.py     : converting GULP's non-standard cif files to standard cif file format. This is for using XRD simulation.
+!               KLMC_get_simulated_xrd.py                : collect cif files and simulate XRD patterns. Expected output is a pickle file that contains taskid, ttheta and intensity.
+!
+!        * misics
+!               KLMC_xrd_single.py     : run single xrd simulation for a cif file.
+!               extract_xrd_sample.py  : access 'KLMC_get_simulated_xrd.py' generated pickle file and extract xrd data of requested taskid
 !
 !
-!   all the details are in *.py scripts
+!
+!
+!

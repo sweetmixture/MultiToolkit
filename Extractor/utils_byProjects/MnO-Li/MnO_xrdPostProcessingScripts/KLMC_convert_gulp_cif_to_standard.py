@@ -1,9 +1,23 @@
-#!/bin/python
-
+#
+#   03.2024 W.Jee 
+#
+#   KLMC Solid Solution: scripts for production phase
+#
 '''
 	Xingfan Zhang, 12/2023
 	Woongkyu Jee, 12/203
+
+	* converting nosym/full GULP cif file to standar cif file for futher XRD analysis
 '''
+# USER DEFINE ----
+_gulp_cif_filename = 'cryst.cif'     # this may vary by user's setting of KLMC input file -> see output cif command option word in GULP
+_gulp_klmc_tf_prefix = 'A'           # klmc taskfarming gulp run directory prefix, e.g., A0, A1, A2, ... A9999.
+_gulp_converted_filename = 'std.cif'   # expected converted output cif file name
+# USER DEFINE ----
+#
+# * IMPORTANT * see line number 98
+# if any dummy atom is used, e.g., different atom name to represent different oxidation state -> their name must be replaced back to normal
+# such replacement could be done by the line in 98. This is user's responsibility
 
 import os
 import sys
@@ -63,7 +77,7 @@ def transform_cif_to_standard(input_content):
 files_to_transform = [os.path.join(root, filename) 
 					  for root, dirs, files in os.walk(".")
 					  for filename in files 
-					  if filename == "cryst.cif" and root.startswith("./A")]
+					  if filename == f"{_gulp_cif_filename}" and root.startswith(f"./{_gulp_klmc_tf_prefix}")]
 
 total_files = len(files_to_transform)
 print(f"Found {total_files} files to transform.")
@@ -79,11 +93,14 @@ def process_file(file_path):
 			custom .. wkjee 31.01.2024
 			for the LiMnO2 project purpose ... replace dummy reduced Mn (Tc) -> Mn
 		'''
+		# USER DEFINE ----
+		# CONVERTING DUMMY ATOM NAME BACK TO NORMAL !!!
 		content_a = [line.replace('Tc', 'Mn') for line in file_a.readlines()]
+		# USER DEFINE ----
 
 	transformed_a = transform_cif_to_standard(content_a)
 
-	output_path = os.path.join(os.path.dirname(file_path), "std.cif")
+	output_path = os.path.join(os.path.dirname(file_path), f"{_gulp_converted_filename}")
 	with open(output_path, "w") as file_b:
 		file_b.write("\n".join(transformed_a))
 
