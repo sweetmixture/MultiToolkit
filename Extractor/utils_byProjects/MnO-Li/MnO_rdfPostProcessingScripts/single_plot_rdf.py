@@ -60,6 +60,6 @@ plt.plot(r, sLiTc, label='LiTc', color='blue')
 #plt.xlim([0,8])
 #plt.ylim([0,25])
 plt.legend()
-#plt.savefig('rdfout.png',bbox_inches='tight')
+plt.savefig('rdfout.png',bbox_inches='tight')
 plt.show()
 

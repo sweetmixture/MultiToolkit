@@ -7,10 +7,10 @@
     Xingfan Zhang, 12/2023
     Woongkyu Jee, 12/203
 
-	* note that this code running must be followed after converting all gulp generated cif to standardised 'cif': see 'KLMC_convert_gulp_cif_to_standard.py'
+	* note that to execute this script, you must convert all gulp generated cif to standardised 'cif': see 'KLMC_convert_gulp_cif_to_standard.py' in this directory
 
     * note that to execute this script, you must prepare summary csv file for a taskfarming run: see /MnO-Li/MnO_ProductionPhase_PostScripting/ShellConp/KLMC_PoolGulpEx.py
-      -> xrd simulation performed based on 'taskid' given in the csv file
+    ㄴxrd simulation performs based on 'taskid' given in the csv file
 '''
 # USER ----
 _summary_csvfile = ''
@@ -23,7 +23,7 @@ _xrd_output_summary = 'xrd_output.pkl'  # summarised xrd output in pickle format
 '''
     ! data access through pkl
     import pickle
-    xrd_pkl = pickle.load(f)    # f: xrd{size}.pkl filepath
+    xrd_pkl = pickle.load(f)    # f: xrd_output.pkl filepath
     #
     # using 'taskid' to access xrd data
     #

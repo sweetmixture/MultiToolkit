@@ -9,9 +9,8 @@
 #     (only for a single gulp periodic standard output file)
 #
 #   * setting desired pairs to investigate is user's responsibility.
-#     user must set '_pairlist' variable below
-#
-#     in this example, using a few possible pairs in LiMnO2 where Tc represents reduced Mn: see line 19
+#   ㄴnote that user must set '_pairlist' variable below
+#     ! in this example, using a few possible pairs in LiMnO2 where Tc represents reduced Mn: see line 19
 #
 # USER DEFINE variables ----
 _filepath = 'gulp_klmc.gout'     # set gulp output file that you want to generate RDF
