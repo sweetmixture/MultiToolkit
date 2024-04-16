@@ -50,7 +50,8 @@ def expkbt_obs(E,T,O):
 	x : model variable (Li concentration)
 	T : temperature
 '''
-def get_gz(csvdf,T,vib=False,pkldf=None,ref_freqlist=None):
+
+def get_gz(csvdf,T,vib=False,pkldf=None):
 
 	global _kb
 	global _wavenumber_to_ev
@@ -63,27 +64,21 @@ def get_gz(csvdf,T,vib=False,pkldf=None,ref_freqlist=None):
 	Z = np.float128(0.)
 	G = np.float128(0.)
 
-	_norm_n = np.float128(24.)		# HARD_CODED -> to make the f.u.
-	# check
-	#print(f'dataset Elist length: {len(Elist)}')
-
 	if vib == False:
 
 		for E in Elist:
 			E = np.float128(E) - Egm
 			Z += expkbt(E,T)
 		
-		#Z = np.exp(-Egm/_kb/T) * Z	
-		Z = np.exp(-Egm/_kb/T) * Z / np.float128(len(Elist))
+		Z = np.exp(-Egm/_kb/T) * Z	
 		G = - _kb * T * np.log(Z)
 		#print(Egm,-Egm/_kb/T,np.exp(-Egm/_kb/T),Z,G)
 	#
 	# include vibrational contributions
-	# WKJee 03.24 added : full vibrational modes using quantum number
 	#
 	elif vib == True:
 		#
-		# looping (states) structures / distinguished by 'taskid'
+		# looping thru structures / distinguished by 'taskid'
 		#
 		for E,taskid in zip(Elist,csvdf['taskid'].values):
 
@@ -94,58 +89,23 @@ def get_gz(csvdf,T,vib=False,pkldf=None,ref_freqlist=None):
 			# get freq info for this struct
 			#
 			freqlist = np.array(pkldf[taskid],dtype=np.float128)
-			# add ZPE contribution - at the gamma point
+			# add ZPE contribution - gamma point ?
 			freq0_power = np.float128(0.)
-
-			# ! NEW : for quantum 'n' -> 0,1,2,...,inf
-			freq_infsum = np.float128(1.)
-
-			#
-			# looping all modes
-			#
 			for freq in freqlist:
-				# zpe 
-				freq0_power += (0.5 * freq * _wavenumber_to_ev)	# this term is exactly same with ZPE
-				# all vib
-				freq_infsum *= (1./(1. - np.exp(-freq*_wavenumber_to_ev/_norm_n/_kb/T)))  # 24 HARD_CODED for normalisation per f.u.
-
-			#Zvib0 = np.exp(-freq0_power/_kb/T)
-			Zvib0 = np.exp(-freq0_power/_norm_n/_kb/T)		# 24 HARD_CODED for normalisation per f.u.
-			# for quantum 'n': add all vib contribution
-			Zinfsum = freq_infsum
+				freq0_power += (0.5 * freq * _wavenumber_to_ev)	
+			Zvib0 = np.exp(-freq0_power/_kb/T)
+	
+			# add all vib contribution
+			# NotImplemented
 
 			# sum up
-			Z += (ZE * Zvib0 * Zinfsum)
-			#! Z += (ZE * Zvib0)
+			Z += (ZE * Zvib0)
 
 		# pull back Egm
-		Z = np.exp(-Egm/_kb/T) * Z / np.float128(len(Elist))		# division 10000 -> HARD_CODED need to be corrected
-		G = - _kb * T * np.log(Z)
-
-		# ------------
-		# NEW_ADDITION reference freq list treatment
-		# ------------
-		ref_freq0_power = np.float128(0.)
-		ref_freq_infsum = np.float128(1.)
-		for freq in ref_freqlist:			# this ref_freqlist : after dropping out rot/trans + no negative
-			# zpe reference
-			ref_freq0_power += (0.5 * freq * _wavenumber_to_ev)
-			# all vib reference
-			ref_freq_infsum *= (1./(1. - np.exp(-freq*_wavenumber_to_ev/_norm_n/_kb/T)))
-
-		rZvib0 = np.exp(-ref_freq0_power/_norm_n/_kb/T)
-		rZinfsum = ref_freq_infsum
-
-		# ------------
-		# NEW_ADDITION : Li Correction? : exp(-E_ZP/kbT) * ProdSum(j) 1/(1 - exp(-hcvj/kbT))
-		# ------------
-		# this modification must be done on Ecorr term !! or as : (x * Evib_corr)
-
-		Z = Z / rZvib0 / rZinfsum
+		Z = np.exp(-Egm/_kb/T) * Z
 		G = - _kb * T * np.log(Z)
 
 	return np.float128(G),np.float128(Z)
-
 
 
 #
@@ -431,7 +391,7 @@ print(f' ! ---------------------------------------------------------------------
 _Tc = _T
 # VERY IMPORTANT USER PARAMETER : SETTING delta T for central difference method to calculate 'S'
 #_dT = 0.025
-_dT = 0.5
+_dT = 1.0
 _Tf = _T + _dT
 _Tb = _T - _dT
 _Tfb = [_Tf,_Tb]
@@ -449,9 +409,7 @@ for _T in _Tfb:
 	for s, (std_df,freq_df) in enumerate(zip(std_dflist,freq_dflist)):
 	
 		#print(f' * processing partition function Z : size {s}')
-		#Gc,Zc = get_gz(std_df,_T,vib=_include_vib,pkldf=freq_df)		# MUST INCLUDE VIB FOR X = 0 Otherwise -> ERRRRRORRRRR!!!
-		Gc,Zc = get_gz(std_df,_T,vib=_include_vib,pkldf=freq_df,ref_freqlist=np.array(freq_dflist[0][0],dtype=np.float128))
-
+		Gc,Zc = get_gz(std_df,_T,vib=_include_vib,pkldf=freq_df)		# MUST INCLUDE VIB FOR X = 0 Otherwise -> ERRRRRORRRRR!!!
 		npGlist[s] = Gc
 		npZlist[s] = Zc
 	
@@ -776,10 +734,7 @@ for x in sxlist:
 
 of.close()
 
-#
-# WKJEE. 21/03/2024
-# DO NOT TRUST RESULTS BY BELOW
-#
+
 of = open(f'dHST{_Tc}_d{_dT}.out','w')
 if _unitJ == True:
 	of.write('%20s  %20s  %20s %20s\n' % ('x','dΔG/dx(kJ/mol)','dΔH/dx(kJ/mol)','dΔS/dx(J/mol/K)'))
