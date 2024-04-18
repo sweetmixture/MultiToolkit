@@ -63,9 +63,9 @@ class Profiler():
 		print(f'* Initiating KLMC3 task-farming profiler')
 		print(f'----------------------------------------------------------------------------------------------')
 		print(f'')
-		print(f' logfile path : {self.root}')
-		print(f' number of master files : {len(self.master_log_plist)}')
-		print(f' number of workgroup files : {len(self.workgroup_log_plist)}')
+		print(f'  logfile path: {self.root}')
+		print(f'  number of master    files: {len(self.master_log_plist)}')
+		print(f'  number of workgroup files: {len(self.workgroup_log_plist)}')
 		print(f'')
 
 
@@ -182,15 +182,9 @@ class Profiler():
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['send_t'] = send_time_obj
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['recv_t'] = None
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['elap_t'] = None
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['sendrecv_elap_t'] = None
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['send_success'] = True
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['recv_success'] = None			# None -> Unknown
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['sendrecv_success'] = None
-
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['mpi_overhead'] = None
-
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['app_elap_t'] = None
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['app_launch_overhead'] = None
 
 					#print(master_log_json)
 					#print(f'workgroup : {workgroup_id} / taskid : {task_id}')			
@@ -253,7 +247,6 @@ class Profiler():
 
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['send_t'] = send_time_obj			# tf-interface measured: task MPI_SEND
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['recv_t'] = None					# tf_interface measured: task MPI_RECV
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['sendrecv_elap_t'] = None					# tf_interface measured: task MPI_RECV
 
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['exe_t'] = None					# tf-interface measured: app executed time	
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['ret_t'] = None					# tf-interface measured: app returned time
@@ -264,9 +257,8 @@ class Profiler():
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['recv_success'] = None			# tf-interface : logging MPI_RECV
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['sendrecv_success'] = None
 
-						# application timing: if None, not known for various reasons
+						# application timing: only valid when send/recv succeeded!!!
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['app_elap_t'] = None				# application level, app measured elapsed time
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['app_launch_overhead'] = None				# application level, app measured elapsed time
 
 
 					#print(master_log_json)
@@ -353,9 +345,6 @@ class Profiler():
 						#self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['send_t'] = send_time_obj			# tf-interface measured: task MPI_SEND
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['recv_t'] = recv_time_obj				# tf_interface measured: task MPI_RECV
 
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['sendrecv_elap_t'] = (				# tf_interface measured: recv_t - send_t (master.log standard)
-							recv_time_obj['abs'] - self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['send_t']['abs'])
-
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['exe_t'] = task_execute_time_obj		# tf-interface measured: app executed time	
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['ret_t'] = task_return_time_obj		# tf-interface measured: app returned time
 						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['elap_t'] = (							# tf-interface measured: app returned t - app executed t
@@ -368,60 +357,16 @@ class Profiler():
 						if self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['send_success']:
 							self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['sendrecv_success'] = True
 
-						# application timing: if None, not known for various reasons
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['app_elap_t'] = None				# application level, app measured elapsed time
-						self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['app_launch_overhead'] = None				# application level, app measured elapsed time
-
-		# if carried out (method calls)
-		self._app_level_update = False
-
-
-	# aux function for 'update_app_runtime'
-	def _gulp_process_workgroup(self,arg):
-
-		_app_runtime_pattern = 'Total CPU time' # HC
-		_app_output_file = 'gulp_klmc.gout'
-
-		workgroup_id, task_id_list = arg
-
-		ret = {}
-
-		for task_id in task_id_list:
-			# app output path check
-			_app_outputfile_path = os.path.join(self.app_root,f'A{task_id}/'+_app_output_file)
-			_app_outputfile_check = os.path.exists(_app_outputfile_path)
-
-			app_runtime = None	# if 'None' result is not known, e.g., calculation failed
-			if _app_outputfile_check:
-
-				with open(_app_outputfile_path,'r') as f:
-					for line in f:
-						# find CPU runtime pattern
-						if _app_runtime_pattern in line:
-							ls = line.split()
-							try:
-								app_runtime = float(ls[3])	# convert to second
-							except:
-								app_runtime = None
-						#else:
-						#	app_runtime = None
-							break
-			else:
-				app_runtime = None
-
-			ret[task_id] = app_runtime
-
-		return ret
+						# application timing: only valid when send/recv succeeded!!!
+						#self.master_log_json[ int(workgroup_id) ][ int(task_id) ]['app_elap_t'] = None				# application level, app measured elapsed time
 
 	def update_app_runtime(self,app,root):
-
-		self._app_level_updated = True
 
 		# only support 'GULP 6.1.2'
 		self.application = app
 		self.app_root = root
 
-		print(f' * Retrieving application-level runtime')
+		print(f' Retrieving application-level runtime')
 		print(f'')
 
 		if app == 'gulp':
@@ -430,33 +375,42 @@ class Profiler():
 			print(f' logfile root: {self.app_root}')
 			print(f'')
 
+			_app_runtime_pattern = 'Total CPU time' # HC
+			_app_output_file = 'gulp_klmc.gout'
+
 			if os.path.exists(root):
+				
+				# looping workgroups
+				# for workgroup_id in self.master_log_json.keys():
+				for workgroup_id in tqdm(self.master_log_json.keys(), desc='Processing Workgroups'):
 
-				# create worklist
-				tasklist = []
-				for workgroup_id in self.master_log_json.keys():
-					task_id_list = list(self.master_log_json[workgroup_id].keys())
-					taskelem = (workgroup_id, task_id_list)
-					tasklist.append(taskelem)
+					# looping tasks
+					for task_id in self.master_log_json[workgroup_id].keys():
+					
+						# app output path check
+						_app_outputfile_path = os.path.join(self.app_root,f'A{task_id}/'+_app_output_file)
+						_app_outputfile_check = os.path.exists(_app_outputfile_path)
 
-				expect_outcomes = []
-				with tqdm(total=len(tasklist), desc=' processing workgroups', unit='task') as pbar:
-					with ProcessPoolExecutor(max_workers=64) as executor:
-						for result in executor.map(self._gulp_process_workgroup,tasklist):
-							expect_outcomes.append(result)
-							pbar.update(1)
+						# if app outputfile exists
+						if _app_outputfile_check:
 
-				# updating
-				for workgroup_id, app_content in enumerate(expect_outcomes):
-					# app_content <dic> : { taskid: runtime, taskid: runtime .... }
-					# key: task_id / value: runtime
-					for key,value in app_content.items():
-						self.master_log_json[workgroup_id][key]['app_elap_t'] = value
-
-						try:
-							self.master_log_json[workgroup_id][key]['app_lauch_overhead'] = (self.master_log_json[workgroup_id][key]['elap_t'] - value)
-						except:
-							self.master_log_json[workgroup_id][key]['app_lauch_overhead'] = None
+							app_runtime = None	# if 'None' result is not known, e.g., calculation failed
+							with open(_app_outputfile_path,'r') as f:
+								for line in f:
+									# find CPU runtime pattern
+									if _app_runtime_pattern in line:
+										ls = line.split()
+										try:
+											app_runtime = float(ls[3])	# convert to second
+										except:
+											app_runtime = None
+									else:
+										app_runtime = None
+						else:
+							app_runtime = None
+						# logging
+						self.master_log_json[workgroup_id][task_id]['app'] = {}
+						self.master_log_json[workgroup_id][task_id]['app']['runtime'] = app_runtime
 
 			else:
 				print(f' Error: path {self.app_root} does not exists')
@@ -517,13 +471,8 @@ if __name__=='__main__':
 	#print(master_log[workgroup_id].keys())
 
 	# update application runtime
+	kp.update_app_runtime(app='gulp',root=applog_path)
 	workgroup_id = 9
 	kp.print_workgroup_log(workgroup_id)
-	#print(master_log[workgroup_id].keys())
+	print(master_log[workgroup_id].keys())
 
-	kp.update_app_runtime(app='gulp',root=applog_path)
-
-	print('')
-	workgroup_id = 152
-	kp.print_workgroup_log(workgroup_id)
-	#print(master_log[workgroup_id].keys())

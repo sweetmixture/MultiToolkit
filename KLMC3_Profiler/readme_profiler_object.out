@@ -10,40 +10,57 @@
 
 klmc_profiler_object ('self.master_log_json') in the Profiler.py
 {
-	* * * structure * * *
+	!!! STRUCTURE DESCRIPTION
 
-	'tf_start_t'<str> : date_time_object<dict> e.g., {'year': '2023', 'month': 11, 'day': 14, 'hour': 18, 'minute': 7, 'second': 2, 'microsecond': 0, 'abs': 1699985222.0} - checkout 'TimeManager.py'
+	A. master_config_json = {}
 
-	'cpu_per_workgroup'<str> : cpu-allocated-per-workgroup<int>
-	'cpu_per_taskfarm'<str>  : cpu-allocated-per-taskfarm<int>
+		'tf_start_t'<str> : date_time_object<dict> e.g., {'year': '2023', 'month': 11, 'day': 14, 'hour': 18, 'minute': 7, 'second': 2, 'microsecond': 0, 'abs': 1699985222.0} - checkout 'TimeManager.py'
 
-	#
-	#	profiling source : workgroup timings
-	#
-	'workgroup_id'<int> : {
+		'cpu_per_workgroup'<str> : cpu-allocated-per-workgroup<int>
+		'cpu_per_taskfarm'<str>  : cpu-allocated-per-taskfarm<int>
+
+
+	
+	B. master_log_json = {}
+
+		profiling source : workgroup timings
+		
+		'workgroup_id'<int> : {
 
 		#
 		#	task_id that processed by the 'workgroup(_id)'
 		#
 		'task_id'<int> : {
 
-			'send_t'<str>           : date_time_object<dict>, including MPI_Send timing from 'master' -> 'workgroup' for 'task_id'
-			'send_success'<str>     : True<bool> only, if not sent the task_id does simply not exist as a key
+			'send_t'<str>               : date_time_object<dict>, including MPI_Send timing from 'master' -> 'workgroup' for 'task_id'
+			'send_success'<str>         : True<bool> only, if not sent the task_id does simply not exist as a key
  
 			!
 			! if recv_successful then following items are valid otherwise : 'recv_t','elap_t','recv_success','sendrecv_success' are all 'None' and the rests do not exists (no keys!!)
 			!
-			'recv_t'<str>           : date_time_object<dict>, including MPI_Recv timing from 'workgroup' -> 'master' for 'task_id'
-			'exe_t'<str>            : date_time_object<dict>, including application launched time by workgroup, 'application: consumes computational resource'
-			'ret_t'<str>            : date_time_object<dict>, including application returned time by workgroup
+			'recv_t'<str>               : date_time_object<dict>, including MPI_Recv timing from 'workgroup' -> 'master' for 'task_id'
+			'exe_t'<str>                : date_time_object<dict>, including application launched time by workgroup, 'application: consumes computational resource'
+			'ret_t'<str>                : date_time_object<dict>, including application returned time by workgroup
 
-			'elap_t'<str>           : <float>, system measured time 'in seconds' that application used, i.e., 'ret_t' - 'exe_t'
+			'sendrecv_elap_t'           : <float>, system measured time, 'recv_t' - 'send_t'
 
-			'mpi_overhead'<str>     : <float>, system measured time that lost by MPI_Send/Recv, i.e., ('recv_t' - 'send_t') - 'elap_t'
+			'elap_t'<str>               : <float>, system measured time 'in seconds' that application used, i.e., 'ret_t' - 'exe_t'
 
-			'recv_success'<str>     : True/None, if recv successful then 'True' else 'None'
-			'sendrecv_success'<str> : if 'send_success/recv_success' are 'True' then 'True' else 'None'
+			'mpi_overhead'<str>         : <float>, system measured time that lost by MPI_Send/Recv, i.e., ('recv_t' - 'send_t') - 'elap_t'
+
+			'recv_success'<str>         : True/None, if recv successful then 'True' else 'None'
+			'sendrecv_success'<str>     : if 'send_success/recv_success' are 'True' then 'True' else 'None'
+
+			# retrieving blow is quite expensive, only avaiable on-demend
+			'app_elap_t'<str>           : application-level measured run time: must be less than 'elap_t' or 'elap_t' + 'mpi_overhead'
+			'app_launch_overhead'<str>' : 'elap_t' (system-measured) - 'app_elap_t' (app-level measrued)
 		}
+
+		Total computation time for 'a workgroup' will be:
+
+			Sum('app_elap_t') + Sum('app_launched_overhead') + Sum('mpi_overhead')
+			app-level elap_t    app_returned - app_executed    master <--> workgroup MPI_Send/Recv overhead
+			
 
 		* coutinuation of 'task_id's ...
 
