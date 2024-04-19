@@ -8,16 +8,36 @@
 #
 # ----------------------------------------------------------
 
-import sys,os
+import sys,os,json
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 from TimeManager import klmc_get_time, gulp_get_time
 
 class Profiler():
 
-	def __init__(self,root):
+	def __init__(self,root,master_log=None,config_log=None):
+
+		self.master_config_json = {}
+		self.master_log_json = {}
+
+		if not None in [master_log,config_log]:
+
+			# print this mode description
+			try:
+				with open(master_log,'r') as log_file:
+					print(f' loading ... {master_log}')
+					self.master_log_json = json.load(log_file)
+				with open(config_log,'r') as config_file:
+					print(f' loading ... {config_log}')
+					self.master_config_json = json.load(config_file)
+			except:
+				print(f' Error while loading files : {master_log} / {config_log}')
+				sys.exit(1)
+
+			return
 
 		self.root = root
+		self.master_config_json['root'] = self.root
 
 		if not os.path.exists(self.root):
 			print(f'Error: class Profiler() root path does not exist',file=sys.stderr)
@@ -75,9 +95,7 @@ class Profiler():
 
 			tf_start_t : time starting taskfarm (just after finished taskfarm configuration)
 		'''
-		self.master_config_json = {}
-		self.master_log_json = {}
-
+		# index 'k' is workgroup-tag!!
 		for k in range(len(self.workgroup_log_plist)):
 
 			self.master_log_json[k] = {}
@@ -454,9 +472,9 @@ class Profiler():
 						self.master_log_json[workgroup_id][key]['app_elap_t'] = value
 
 						try:
-							self.master_log_json[workgroup_id][key]['app_lauch_overhead'] = (self.master_log_json[workgroup_id][key]['elap_t'] - value)
+							self.master_log_json[workgroup_id][key]['app_launch_overhead'] = (self.master_log_json[workgroup_id][key]['elap_t'] - value)
 						except:
-							self.master_log_json[workgroup_id][key]['app_lauch_overhead'] = None
+							self.master_log_json[workgroup_id][key]['app_launch_overhead'] = None
 
 			else:
 				print(f' Error: path {self.app_root} does not exists')
@@ -473,24 +491,44 @@ class Profiler():
 	def get_master_log(self):
 		return self.master_log_json
 
+	# Printings
+
 	def print_workgroup_log(self,workgroup_id):
 
 		print(f'# printing workgroup_id {workgroup_id} log')
 		for key in self.master_log_json[workgroup_id].keys():
 			print(f' task_id: {key}, {self.master_log_json[workgroup_id][key]}')
 
+
+	# File Writing ----------
+	def save_log(self):
+
+		with open('master_log.json', 'w') as log_file:
+			json.dump(self.master_log_json, log_file, indent=4)
+
+		with open('master_config.json', 'w') as config_file:
+			json.dump(self.master_config_json, config_file, indent=4)
+
 	# END class Profiler() init()
 
 if __name__=='__main__':
 
 	# variables start ------
-	logpath = '/work/e05/e05/wkjee/Masters/Zirui2023/MnO/conpshell/li24/log'						# Complete set small
-	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax72/p64/log'	# In-complete set
-	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/p33/log'	# Complete set mideum
+	#logpath = '/work/e05/e05/wkjee/Masters/Zirui2023/MnO/conpshell/li24/log'						# Complete set small
+	#logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax72/p64/log'	# In-complete set
+	#logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/p33/log'	# Complete set mideum
 
+
+
+
+	# set 2
 	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_2_p33/log'
-
 	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_2_p33/result'
+
+	# set 1
+	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_1_p33/log'
+	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_1_p33/result'
+
 	app = 'gulp'
 
 	# variables end --------
@@ -518,12 +556,20 @@ if __name__=='__main__':
 
 	# update application runtime
 	workgroup_id = 9
-	kp.print_workgroup_log(workgroup_id)
+	#kp.print_workgroup_log(workgroup_id)
 	#print(master_log[workgroup_id].keys())
 
+	#
+	# UPDATE APPLICATION LEVEL - CPUtime
+	#
 	kp.update_app_runtime(app='gulp',root=applog_path)
 
 	print('')
 	workgroup_id = 152
-	kp.print_workgroup_log(workgroup_id)
+	#kp.print_workgroup_log(workgroup_id)
 	#print(master_log[workgroup_id].keys())
+
+	kp.save_log()
+
+	# json files ----- (1) : kp
+
