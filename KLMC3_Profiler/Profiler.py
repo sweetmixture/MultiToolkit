@@ -491,6 +491,10 @@ class Profiler():
 	def get_master_log(self):
 		return self.master_log_json
 
+	def get_master_config(self):
+		return self.master_config_json
+
+
 	# Printings
 
 	def print_workgroup_log(self,workgroup_id):
@@ -521,13 +525,25 @@ if __name__=='__main__':
 
 
 
-	# set 2
+	# set 2 - 16 CPUs 64 nodes
 	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_2_p33/log'
 	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_2_p33/result'
 
 	# set 1
 	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_1_p33/log'
 	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_1_p33/result'
+
+	# set 3 - 16 CPUs 128 nodes
+	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_3_p33/log'
+	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_3_p33/result'
+
+	# set 4 - 16 CPUs 256 nodes
+	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_4_p33/log'
+	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_4_p33/result'
+
+	# set 5 - 4 CPUs per workgroup 128 nodes
+	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_5_p33/log'
+	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_5_p33/result'
 
 	app = 'gulp'
 

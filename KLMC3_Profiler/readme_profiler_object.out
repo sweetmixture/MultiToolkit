@@ -84,7 +84,21 @@ klmc_profiler_object ('self.master_log_json') in the Profiler.py
 		!
 	}
 
-
-
-
 wkjee 17.04 2024 updated 
+
+
+# -----------------------
+  Derived Scripts
+# -----------------------
+
+	Analysis_1.py :
+
+		retrieving following items and plot full simulation time for workers
+
+		* init_delay : internally measured during the run time of this script
+
+		app_elap_t + app_launch_oh (app_launch_overhead) + mpi_oh (mpi_overhead)
+		
+	Analysis_2.py :
+
+		NotImplemented

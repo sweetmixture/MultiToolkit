@@ -4,30 +4,30 @@ from Profiler import Profiler
 import numpy as np
 import sys
 
-log1 = '/work/e05/e05/wkjee/Software/MultiToolkit/KLMC3_Profiler/jsonfiles/set5_log.json'
-config1 = '/work/e05/e05/wkjee/Software/MultiToolkit/KLMC3_Profiler/jsonfiles/set5_config.json'
+log1 = '/Users/woongkyujee/Desktop/PAX_Generic/PAX_Lancaster04.24/SOURCE/Plots/jsonfiles/set5_log.json'
+config1 = '/Users/woongkyujee/Desktop/PAX_Generic/PAX_Lancaster04.24/SOURCE/Plots/jsonfiles/set5_config.json'
 
 #
 # load pre-calculated profiling result from files: log1 / config1
 #
 kd = Profiler(root=None,master_log=log1,config_log=config1)
 
-#
 # get self.master_log_json
-#
-log = kd.get_master_log()			# get log<json>
-workgroup_count = len(log.keys())	# get workgroup_count<int>
+log = kd.get_master_log()
 
-log_config = kd.get_master_config()	# get config<json>
-time0 = log_config['start_t']['abs']# get KLMC-taskfarm start-time
+# workgroup_count
+workgroup_count = len(log.keys())
 
-# -------------
-# Get timing for the following contents, workplace or used for further analysis
-# -------------
+# Get timing for the following contents
 app_elap_t = [ [] for i in range(workgroup_count) ]			# application level elapsed time
 app_launch_oh = [ [] for i in range(workgroup_count) ]		# application laucnh overhead : including task unpacking after recv / task packing before sendback
 mpi_oh = [ [] for i in range(workgroup_count) ]				# master <-> worker mpi-overhead
-init_delay = [ time0*-1. for i in range(workgroup_count) ]	# logging initial_delay master --- MPI_Send<Task> ---> worker
+
+# get KLMC start time
+log_config = kd.get_master_config()
+time0 = log_config['start_t']['abs']
+#print(time0)
+init_delay = [ time0*-1. for i in range(workgroup_count) ]
 
 for k,key in enumerate(log.keys()): # k: workgroup idex, key: workgroup
 	for m,task_id in enumerate(log[key].keys()):
@@ -41,16 +41,32 @@ for k,key in enumerate(log.keys()): # k: workgroup idex, key: workgroup
 			app_launch_oh[k].append( log[key][task_id]['app_launch_overhead'] )
 			mpi_oh[k].append( log[key][task_id]['mpi_overhead'] )
 
-# -------------
-
-print(f' -----------------------------------')
+#print(init_delay)
 print(f' Max init delay: {max(init_delay)}')
 print(f' init_delay/nworkgroups : {max(init_delay)/workgroup_count}')
-print(f' -----------------------------------')
+#sys.exit(1)
+# data check 1
+#for k,key in enumerate(log.keys()):
+#	l1 = len(app_elap_t[k])
+#	l2 = len(app_launch_oh[k])
+#	l3 = len(mpi_oh[k])
+#	print(l1,l2,l3)
+#
+#print('APP-ELAP-T',app_elap_t[0],end='\n')
+#print('APP_LOH',app_launch_oh[0],end='\n')
+#print('MPI_OH',mpi_oh[0],end='\n')
 
-# -------------
+# INDEXING
+# Red (application level elapt) : ‘app_elap_t’
+# Green: ‘app_launch_overhead’
+# Blue: ’mpi_overhead’
+
+#print(log.keys()) # keys() : list[workgroup ids]
+#kd.print_workgroup_log('9')
+
+#
 # find mean & std
-# -------------
+#
 app_elap_t_sum = []
 app_launch_oh_sum = []
 mpi_oh_sum = []
@@ -61,6 +77,9 @@ mpi_oh_std = []
 for list_item in app_elap_t:
 	app_elap_t_sum.append(np.sum(list_item))
 	app_elap_t_std.append(np.std(list_item))
+#print(app_elap_t_sum)
+#print('\n\n\n')
+#print(app_elap_t_std)
 for list_item in app_launch_oh:
 	app_launch_oh_sum.append(np.sum(list_item))
 	app_launch_oh_std.append(np.std(list_item))
@@ -68,32 +87,24 @@ for list_item in mpi_oh:
 	mpi_oh_sum.append(np.sum(list_item))
 	mpi_oh_std.append(np.std(list_item))
 
-# -------------
 
-# -------------
-# Logging Total Time : 'init_delay' + 'mpi_oh_sum' + 'app_launch_oh_sum' + 'app_elap_t_sum'
-# see line 27-30
-# -------------
 sum_all = np.add(app_elap_t_sum,app_launch_oh_sum)
 sum_all = np.add(sum_all,mpi_oh_sum)
 sum_all = np.add(sum_all,init_delay)
-# -------------
 
-print(f' -----------------------------------')
 print(f' sum all max     : {max(sum_all.tolist())}')
 print(f' sum all min     : {min(sum_all.tolist())}')
 print(f' sum all average : {np.mean(sum_all)}')
 print(f' sum max - ave   : {max(sum_all.tolist()) - np.mean(sum_all)}')
-print(f' -----------------------------------')
 
-# -------------
-# Figure Generation
+#
 # bar plotting -------------------------------------------
 #
 # Plot configuration
 cm = 1/2.54
 fig, ax = plt.subplots(figsize=(24*cm, 20*cm))
 plt.subplots_adjust(left=0.125, bottom=0.125, right=0.96, top=0.96, wspace=0.200, hspace=0.0)
+
 
 N = workgroup_count
 ind = np.arange(N)    # the x locations for the groups
@@ -131,7 +142,7 @@ ax.tick_params(axis='y', labelsize=_fs)  # Corrected line
 ax.set_ylim(np.mean(sum_all)-np.mean(sum_all)*0.1,max(sum_all.tolist())+max(sum_all.tolist())*0.01)
 
 # Show plot
-# plt.show()
+plt.show()
 
 fig.savefig(f'A1.png', dpi=1200, bbox_inches='tight')
 #fig.savefig(f'A1.pdf', format='pdf', dpi=1200, bbox_inches='tight')
