@@ -30,7 +30,7 @@ class Cell(object):
 		self.lconstants = [ 0. for i in range(3)]
 		self.langles	= [ 0. for i in range(3)]
 		self.volume		= 0.
-		self.atom_list	= []
+		self.atom_list	= []	# look 'Atoms.py'
 
 		# Experimental 20.10.2023
 		self.sort_lattice_reference = [ 0. for i in range(3) ]
@@ -96,6 +96,10 @@ class Cell(object):
 		#	[ bx, by, bz ]
 		#	[ cx, cy, cz ]	-> arbitrary orientation
 		#
+		#	* After this execution
+		#	'lvectors'    set
+		# 	'lconstants'  set
+		#	'langles'     set
 		if lvectors is not None:
 
 			self.set_lvectors(lvectors)

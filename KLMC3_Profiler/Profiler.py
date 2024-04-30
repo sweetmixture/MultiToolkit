@@ -545,6 +545,10 @@ if __name__=='__main__':
 	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_5_p33/log'
 	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_5_p33/result'
 
+	# set 6 - 8 CPUs per workgroup 128 nodes
+	logpath = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_6_p33/log'
+	applog_path = '/work/e05/e05/wkjee/SolidSolution/Batteries/IronPhospate/ProductionMax36/set_6_p33/result'
+
 	app = 'gulp'
 
 	# variables end --------
