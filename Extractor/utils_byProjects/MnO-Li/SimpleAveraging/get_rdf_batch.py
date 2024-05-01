@@ -10,6 +10,22 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 from Extractor.GULPstruct import GULPLattice
 
+'''
+	require 2 essential inputs
+
+	(1) tarset : integer for writing output pkl format file, including rdf information
+	(2) csvfile: including information of taskid and fhiaims geometry file to generate rdf
+
+		from this csvfile, including summarised output from VVUQ-FHIaims runs, taskid may be missing, therefore a user must be carefule to use this script.
+
+		at the moment, it uses
+
+			taskidlist = (df['Unnamed: 0']+1).tolist()
+
+		python command to extract correct ${taskid} / e.g., ${taskid}_aims.in.rotate / ${taskid}_aims_final.in / etc.
+
+'''
+
 print(' * --------')
 print(' ! RDF collection : 23-01-2024')
 print(' * --------')
