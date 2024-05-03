@@ -111,10 +111,9 @@ print(f' ! total AX clusters: 0, uq, final done')
 """
 
 #
-# calculate delta_d : return <list>[8<float>]
+# calculate delta_d : return <list:float>[8]
 #
-
-ax_cluster_0_dd = calculate_delta_d(ax_cluster_0,C='Cs',S='I')    # ddlist <list:float>[8]
+ax_cluster_0_dd = calculate_delta_d(ax_cluster_0,C='Cs',S='I')
 print(ax_cluster_0_dd)
 ax_cluster_uq_dd = calculate_delta_d(ax_cluster_uq,C='Cs',S='I')
 print(ax_cluster_uq_dd)
@@ -127,3 +126,24 @@ bx_cluster_uq_dd = calculate_delta_d(bx_cluster_uq,C='Pb',S='I')
 print(bx_cluster_uq_dd)
 bx_cluster_final_dd = calculate_delta_d(bx_cluster_final,C='Pb',S='I')
 print(bx_cluster_final_dd)
+
+#
+# calculate beta angles: return
+#
+#     def calculate_beta(cluster,C='',S='',cutd=4.0):
+#         ...
+#         return beta_a, beta_b, beta_c # <list:float>[4] each
+#
+
+# Note. this applied only to 'B-X-B'
+print(f' * TESTING Beta - 0  : order a[x], b[y], c[z]')
+tmp_ba, tmp_bb, tmp_bc = calculate_beta(fbx_cluster_0,C='I',S='Pb')
+print(tmp_ba,tmp_bb,tmp_bc)
+print(f' * TESTING Beta - UQ : order a[x], b[y], c[z]')
+tmp_ba, tmp_bb, tmp_bc = calculate_beta(fbx_cluster_uq,C='I',S='Pb')
+print(tmp_ba,tmp_bb,tmp_bc)
+print(f' * TESTING Beta - Final : order a[x], b[y], c[z]')
+tmp_ba, tmp_bb, tmp_bc = calculate_beta(fbx_cluster_final,C='I',S='Pb')
+print(tmp_ba,tmp_bb,tmp_bc)
+
+

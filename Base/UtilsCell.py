@@ -687,8 +687,9 @@ def calculate_beta_pnma(cluster,C='',S='',cutd=4.0):
 #
 #	D. R1 - R0 : R1 after VVUQ uncertainty application, R0 original sample
 #
-def calculate_deltaR(cell1,cell0):
+def calculate_deltaR(cell1,cell0,elem=False):
 
+	elemlist = []
 	signtable = []
 	deltaR = []
 	rmsd = 0.
@@ -697,6 +698,9 @@ def calculate_deltaR(cell1,cell0):
 	atomlist0 = cell0.get_atoms()
 
 	for atom1, atom0 in zip(atomlist1,atomlist0):
+
+		if elem == True: # functionality addition 02.05.2024
+			elemlist.append(atom1.get_element())
 
 		r1 = np.array(atom1.get_cart())
 		r0 = np.array(atom0.get_cart())
@@ -708,22 +712,26 @@ def calculate_deltaR(cell1,cell0):
 		dr = dr.tolist()
 
 		for item in dr:
-			if -5.E-7 < item and item < 5.E-7:
+			if -5.E-9 < item and item < 5.E-9:
 				item = 0.
 			deltaR.append(item)
 
 			if item > 0.:
-				sign = '+'
+				sign = +1
 			elif item < 0.:
-				sign = '-'
+				sign = -1
 			else:
-				sign = '0'
+				sign = 0
 
 			signtable.append(sign)
 
 	rmsd = np.sqrt(rmsd)
 	#print(len(deltaR),len(signtable))
-	return deltaR, signtable, rmsd
+	if elem == False:
+		return deltaR, signtable, rmsd
+
+	if elem == True:
+		return elemlist, deltaR, signtable, rmsd
 
 
 if __name__ == '__main__':
