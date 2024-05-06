@@ -1,27 +1,27 @@
 #!/bin/python
 
 '''
-    Author  :   wkjee
-    Title   :   OutputParser
+	Author	:	wkjee
+	Title	:	OutputParser
 
-    Layout
+	Layout
 
-    /root
-        /Base
-            Atoms.py    : Atom, Shell
-            Clusters.py : Cluster
-            Cells.py    : Cell
-    /Extractor
-        GULP.py     : GULP_Patterns, ExtractFHIaims
-      * FHIaims.py  : FHIaims_Patterns, ExtractFHIaims
+	/root
+		/Base
+			Atoms.py	: Atom, Shell
+			Clusters.py : Cluster
+			Cells.py	: Cell
+	/Extractor
+		GULP.py		: GULP_Patterns, ExtractFHIaims
+	  * FHIaims.py	: FHIaims_Patterns, ExtractFHIaims
 
-        * 29.12.2023
-        /FHIaims    : ...
-            mos.py
+		* 29.12.2023
+		/FHIaims	: ...
+			mos.py
 '''
 
 
-import os,sys
+import os,sys,json
 import numpy as np
 import pandas as pd
 
@@ -35,7 +35,7 @@ def normalize_vector(vector):
 	vector = np.array(vector)
 
 	vector_square = vector ** 2	# [a,b,c] -> [a*a, b*b, c*c]
-	vector_ss     = np.sum(vector_square) # a*a + b*b + c*c
+	vector_ss	  = np.sum(vector_square) # a*a + b*b + c*c
 
 	Return = vector_square / vector_ss # [a*a, b*b, c*c] / (a*a + b*b + c*c)
 
@@ -70,7 +70,7 @@ if _lspin == True:
 	#
 
 	_file_alpha = os.path.join(_root,'alpha.aims')
-	_file_beta  = os.path.join(_root,'beta.aims')
+	_file_beta	= os.path.join(_root,'beta.aims')
 	_file_geometry = os.path.join(_root,'geometry.in')
 
 	if not os.path.exists(_file_alpha):
@@ -111,16 +111,16 @@ if _lspin == True:
 	#
 	# <list:dict>
 	# basis_set = [ 
-	#               {'number'      : <int>, # basis number
-	#                'type'        : <str>, # orbital type: atomic, ionic, hydro ..
-	#                'atom_number' : <int>, # this matches with 'species' in geometry.in file
-	#                'n'           : <int>,
-	#                'l'           : <int>,
-	#                'm'           : <int>,
-	#                'species'     : <str>  # atom name or species name
-	#               },
-	#             ... # repeat same dictionlary 
-	#             ]
+	#				{'number'	   : <int>, # basis number
+	#				 'type'		   : <str>, # orbital type: atomic, ionic, hydro ..
+	#				 'atom_number' : <int>, # this matches with 'species' in geometry.in file
+	#				 'n'		   : <int>,
+	#				 'l'		   : <int>,
+	#				 'm'		   : <int>,
+	#				 'species'	   : <str>	# atom name or species name
+	#				},
+	#			  ... # repeat same dictionlary 
+	#			  ]
 	try:
 		# 1st pass
 		with open(_file_basis,'r') as f:
@@ -156,8 +156,8 @@ if _lspin == True:
 	if __dev_bcheck == True:
 		print(f'basis set 40')
 		basis = basis_set[39]
-		print(f"basis number     : {basis['number']}")
-		print(f"basis type       : {basis['type']}")
+		print(f"basis number	 : {basis['number']}")
+		print(f"basis type		 : {basis['type']}")
 		print(f"basis atom_number: {basis['atom_number']}")
 		print(f"basis n / l / m  : {basis['n']} / {basis['l']} / {basis['m']}")
 	# ========================================
@@ -165,20 +165,20 @@ if _lspin == True:
 	# loading 'alpha.aims' / 'beta.aims' files
 	#
 
-	ks_vectors_up = []   # SAVE_ON_MEM
+	ks_vectors_up = []	 # SAVE_ON_MEM
 	ks_vectors_down = [] # SAVE_ON_MEM	
 	#
 	# * data structure
 	#
 	# ks_vector_up/down = [
-	#                       {'channel'       : <str>,       # 'up'/'down'
-	#                        'state'         : <int>,
-	#                        'eigenvalue'    : <float>,     # Ha unit
-	#                        'eigenvalue_ev' : <float>,     # eV unit
-	#                        'eigenvector'   : <list:float> # evec_list
-	#                       },
-	#                     ...
-	#                     ]
+	#						{'channel'		 : <str>,		# 'up'/'down'
+	#						 'state'		 : <int>,
+	#						 'eigenvalue'	 : <float>,		# Ha unit
+	#						 'eigenvalue_ev' : <float>,		# eV unit
+	#						 'eigenvector'	 : <list:float> # evec_list
+	#						},
+	#					  ...
+	#					  ]
 	try:
 		# read spin channel 'alpha'
 		print(f' Reading-in alpha ...')
@@ -190,12 +190,12 @@ if _lspin == True:
 				if 'eigenvalue' in line:
 					ls = line.split()
 
-					state = int(ls[0])  # state number
+					state = int(ls[0])	# state number
 					nsaos = int(ls[-1]) # number of eigenvector elements
 					eigenv = float(ls[2][11:].replace('D','E'))
 					channel = 'up'
 
-					next_line_count = nsaos//4  # number of lines to read
+					next_line_count = nsaos//4	# number of lines to read
 					last_line_residue = nsaos%4 # number of elements in the last line
 
 					# return
@@ -300,7 +300,7 @@ if _lspin == True:
 	# USER CONTROL: test - treating HOMO alpha
 	#
 	# * for this example case
-	# spin-up HOMO   : 1555
+	# spin-up HOMO	 : 1555
 	# spin-down HOMO : 1554
 	up = 1555 - 1
 	down = 1554 - 1
@@ -388,39 +388,64 @@ if _lspin == True:
 
 	up_state_evals = []
 	down_state_evals = []
-
+	up_state_index = []
+	down_state_index = []
 	# up   = 1555 - 1 = 1554 
 	# down = 1554 - 1 = 1553
 	
-	_min_limit = -8 # USER_CONTROL : scanning ks state bottom limit
-	_max_limit = +8 # USER_CONTROL : scanning ks state top limit
+	_min_limit = +16 # USER_CONTROL : scanning ks state bottom limit
+	_max_limit = +16 # USER_CONTROL : scanning ks state top limit
 	# this setting -8,-7,...,0,1,2,...,8
 
-	for i in range(_min_limit,_max_limit+1):
-		spin_up_states.append(ks_vectors_up[up-i])
-		spin_down_states.append(ks_vectors_down[up-i])
+	#
+	# GET KS_VECTORS
+	#
+	for i in range(-_min_limit,_max_limit+1):
+		spin_up_states.append(ks_vectors_up[up-i])		 # up	: HOMO index
+		spin_down_states.append(ks_vectors_down[down-i]) # down : HOMO index
 	# up   state: 1554-8, 1554-7, ... , 1554+8 : [1546,1562]
 	# down state: 1553-8, 1554-7, ... , 1553+8 : [1545,1561]
 
 	for up_state,down_state in zip(spin_up_states,spin_down_states):
 		up_state_evals.append(up_state['eigenvalue_ev'])
+		up_state_index.append(up_state['state'])
 		down_state_evals.append(down_state['eigenvalue_ev'])
+		down_state_index.append(down_state['state'])
 
-	print(up_state_evals,down_state_evals)
-
+	#
+	# PRINT EIGENVALUE OUTPUT
+	#
+	print(f'')
+	print(f' ! ===========================')
+	print(f' ! KS EIGENVALUE INFO')
+	print(f' ! ===========================')
+	print(f' * spin up state eigenvalues (eV)')
+	for k,ev in zip(up_state_index,up_state_evals):
+		print(f' {k:5d}{ev:20.12f}')
+	print(f' * spin down state eigenvalues (eV)')
+	for k,ev in zip(down_state_index,down_state_evals):
+		print(f' {k:5d}{ev:20.12f}')
+	# saving order top(LOMO) -> bottom(HOMO)
+	#
+	
+	# saving occupancy, i.e., normalised ks vetors
+	# using 
+	# spin_up_states / spin_down_states
 	up_state_occ = []
 	down_state_occ = []
 
 	for up_state,down_state in zip(spin_up_states,spin_down_states):
 
+		# normalize : [a*a, b*b, c*c] / (a*a + b*b + c*c)
 		up_state['eigenvector'] = normalize_vector(up_state['eigenvector'])
 		down_state['eigenvector'] = normalize_vector(down_state['eigenvector'])
 
 		# processing up-state ---
-		Au_sp = 0.
-		Au_d = 0.
-		S_p = 0.
-		O  = 0.
+		# extract desired occupancies
+		Au_sp = 0. # n6 l0 s / n6 l1 p
+		Au_d = 0.  # n5 l2 d
+		S_p = 0.   # n3 l1
+		O  = 0.    # others
 
 		for basisf,velem in zip(basis_set,up_state['eigenvector']):
 
@@ -476,6 +501,39 @@ if _lspin == True:
 				O = O + velem
 
 		down_state_occ.append([Au_sp,Au_d,S_p,O])
+
+
+	# up_state_evals = []
+	# down_state_evals = []
+	# up_state_index = []
+	# down_state_index = []
+	# up_state_occ
+	# down_staet_occ
+
+	#
+	# create json
+	#
+	up_spin_json = {}
+	down_spin_json = {}
+
+	# processing up state
+	for k,ev,occ in zip(up_state_index,up_state_evals,up_state_occ):
+		#up_spin_json[k]['eval'] = ev
+		#up_spin_json[k]['occ'] = occ
+		up_spin_json[k] = {}
+		up_spin_json[k]['eval'] = ev
+		up_spin_json[k]['occ'] = occ
+	with open('selected_up.json', 'w') as log_file:
+		json.dump(up_spin_json, log_file, indent=4)
+	# processing down state
+	for k,ev,occ in zip(down_state_index,down_state_evals,down_state_occ):
+		#down_spin_json[k]['eval'] = ev
+		#down_spin_json[k]['occ'] = occ
+		down_spin_json[k] = {}
+		down_spin_json[k]['eval'] = ev
+		down_spin_json[k]['occ'] = occ
+	with open('selected_down.json', 'w') as log_file:
+		json.dump(down_spin_json, log_file, indent=4)
 
 
 	# --- printing

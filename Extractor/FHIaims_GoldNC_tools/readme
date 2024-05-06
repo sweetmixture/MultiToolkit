@@ -1,0 +1,6 @@
+#
+# 06.05 2024 WKJEE
+#
+
+
+mos_analyser_2.py : dumping selected states (+-8 from HOMO spin up/down) json files
