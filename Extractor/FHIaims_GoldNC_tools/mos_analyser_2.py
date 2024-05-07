@@ -393,8 +393,8 @@ if _lspin == True:
 	# up   = 1555 - 1 = 1554 
 	# down = 1554 - 1 = 1553
 	
-	_min_limit = +16 # USER_CONTROL : scanning ks state bottom limit
-	_max_limit = +16 # USER_CONTROL : scanning ks state top limit
+	_min_limit = +8 # USER_CONTROL : scanning ks state bottom limit
+	_max_limit = +8 # USER_CONTROL : scanning ks state top limit
 	# this setting -8,-7,...,0,1,2,...,8
 
 	#
