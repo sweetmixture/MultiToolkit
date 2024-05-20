@@ -153,7 +153,7 @@ _markuqf= 'uqf'
 # delta_d obtained for: Cs-I; Ih 12 bonds
 #
 _ax_bond_cnt = 12
-ax_cluster_0_dd = calculate_delta_d(ax_cluster_0,bond_cnt=_ax_bond_cnt,C='Cs',S='I')
+ax_cluster_0_dd = calculate_delta_d(ax_cluster_0,bond_cnt=_ax_bond_cnt,C='Cs',S='I')	# this will return a list of 8 numbers (for each 'Cs')
 ax_cluster_uq_dd = calculate_delta_d(ax_cluster_uq,bond_cnt=_ax_bond_cnt,C='Cs',S='I')
 ax_cluster_final_dd = calculate_delta_d(ax_cluster_final,bond_cnt=_ax_bond_cnt,C='Cs',S='I')
 print(f'* Δd values for AX')
@@ -165,35 +165,53 @@ for d0, duq, duqf in zip(ax_cluster_0_dd,ax_cluster_uq_dd,ax_cluster_final_dd):
 # delta_d obtained for: Pb-I; Oh 6 bonds
 #
 _bx_bond_cnt = 6
-bx_cluster_0_dd = calculate_delta_d(bx_cluster_0,bond_cnt=_bx_bond_cnt,C='Pb',S='I')	# this will return a list
+bx_cluster_0_dd = calculate_delta_d(bx_cluster_0,bond_cnt=_bx_bond_cnt,C='Pb',S='I')	# this will return a list of 8 numbers (for each 'Pb')
 bx_cluster_uq_dd = calculate_delta_d(bx_cluster_uq,bond_cnt=_bx_bond_cnt,C='Pb',S='I')
 bx_cluster_final_dd = calculate_delta_d(bx_cluster_final,bond_cnt=_bx_bond_cnt,C='Pb',S='I')
 print(f'* Δd values for BX')
 print(f'{_mark0:>20s}{_markuq:>20s}{_markuqf:>20s}')
 for d0, duq, duqf in zip(bx_cluster_0_dd,bx_cluster_uq_dd,bx_cluster_final_dd):
 	print(f'{d0:20.12e}{duq:20.12e}{duqf:20.12e}')
+
+
+
+
+
 #
 # calculate beta angles: return
+# ㄴMultiToolkit/Base/UtilsCell.py
 #
+#                        'full cluster used'
 #     def calculate_beta(cluster,C='',S='',cutd=4.0):
 #         ...
 #         return beta_a, beta_b, beta_c # <list:float>[4] each
 #
+print(f'')
+print(f'### ------------------------------')
+print(f'### calculating β angles: B-X-B') # i.e. Pb-I-Pb
+print(f'### ------------------------------')
 
-print(f'#')
-print(f'# calculating β angles: B-X-B')
-print(f'#')
+_x_direction = 'x[a]'
+_y_direction = 'y[b]'
+_z_direction = 'z[c]'
+beta_x, beta_y, beta_z = calculate_beta(fbx_cluster_0,C='I',S='Pb')
+print(f'* β angles: 0')
+print(f'{_x_direction:>20s}{_y_direction:>20s}{_z_direction:>20s}')
+for bx, by, bz in zip(beta_x,beta_y,beta_z):
+	print(f'{bx:20.12e}{by:20.12e}{bz:20.12e}')
+beta_x, beta_y, beta_z = calculate_beta(fbx_cluster_uq,C='I',S='Pb')
+print(f'* β angles: uq')
+print(f'{_x_direction:>20s}{_y_direction:>20s}{_z_direction:>20s}')
+for bx, by, bz in zip(beta_x,beta_y,beta_z):
+	print(f'{bx:20.12e}{by:20.12e}{bz:20.12e}')
+beta_x, beta_y, beta_z = calculate_beta(fbx_cluster_final,C='I',S='Pb')
+print(f'* β angles: uqf')
+print(f'{_x_direction:>20s}{_y_direction:>20s}{_z_direction:>20s}')
+for bx, by, bz in zip(beta_x,beta_y,beta_z):
+	print(f'{bx:20.12e}{by:20.12e}{bz:20.12e}')
 
-# Note. this applied only to 'B-X-B'
-print(f' * TESTING Beta - 0  : order a[x], b[y], c[z]')
-tmp_ba, tmp_bb, tmp_bc = calculate_beta(fbx_cluster_0,C='I',S='Pb')
-print(tmp_ba,tmp_bb,tmp_bc)
-print(f' * TESTING Beta - UQ : order a[x], b[y], c[z]')
-tmp_ba, tmp_bb, tmp_bc = calculate_beta(fbx_cluster_uq,C='I',S='Pb')
-print(tmp_ba,tmp_bb,tmp_bc)
-print(f' * TESTING Beta - Final : order a[x], b[y], c[z]')
-tmp_ba, tmp_bb, tmp_bc = calculate_beta(fbx_cluster_final,C='I',S='Pb')
-print(tmp_ba,tmp_bb,tmp_bc)
+
+# sys.exit()
 
 
 ###
