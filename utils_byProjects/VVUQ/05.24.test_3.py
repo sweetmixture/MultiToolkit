@@ -9,7 +9,7 @@ from Base.UtilsCell import calculate_delta_d, calculate_sigma_squared, calculate
 ##
 from Supporting import print_delta_r, print_delta_r_sign
 
-import sys
+import sys,json
 
 # select test set
 _test_set = 'B'
@@ -194,20 +194,20 @@ print(f'### ------------------------------')
 _x_direction = 'x[a]'
 _y_direction = 'y[b]'
 _z_direction = 'z[c]'
-beta_x, beta_y, beta_z = calculate_beta(fbx_cluster_0,C='I',S='Pb')
+beta_x0, beta_y0, beta_z0 = calculate_beta(fbx_cluster_0,C='I',S='Pb')
 print(f'* β angles: 0')
 print(f'{_x_direction:>20s}{_y_direction:>20s}{_z_direction:>20s}')
-for bx, by, bz in zip(beta_x,beta_y,beta_z):
+for bx, by, bz in zip(beta_x0,beta_y0,beta_z0):
 	print(f'{bx:20.12e}{by:20.12e}{bz:20.12e}')
-beta_x, beta_y, beta_z = calculate_beta(fbx_cluster_uq,C='I',S='Pb')
+beta_xuq, beta_yuq, beta_zuq = calculate_beta(fbx_cluster_uq,C='I',S='Pb')
 print(f'* β angles: uq')
 print(f'{_x_direction:>20s}{_y_direction:>20s}{_z_direction:>20s}')
-for bx, by, bz in zip(beta_x,beta_y,beta_z):
+for bx, by, bz in zip(beta_xuq,beta_yuq,beta_zuq):
 	print(f'{bx:20.12e}{by:20.12e}{bz:20.12e}')
-beta_x, beta_y, beta_z = calculate_beta(fbx_cluster_final,C='I',S='Pb')
+beta_xf, beta_yf, beta_zf = calculate_beta(fbx_cluster_final,C='I',S='Pb')
 print(f'* β angles: uqf')
 print(f'{_x_direction:>20s}{_y_direction:>20s}{_z_direction:>20s}')
-for bx, by, bz in zip(beta_x,beta_y,beta_z):
+for bx, by, bz in zip(beta_xf,beta_yf,beta_zf):
 	print(f'{bx:20.12e}{by:20.12e}{bz:20.12e}')
 
 
@@ -268,6 +268,97 @@ print_delta_r(p_input_uq0_dr,elemlist=elemlist)
 print(f' * ctd ... show sign table') # sign table -> -1/+1 binary !!
 print_delta_r_sign(p_input_uq0_sign,elemlist=elemlist)
 
+###
 ### CONVERSION TO JSON?
+### writing above items to 'json'
+###
+###
+
+'''
+	list of extracted data
+
+	* for plain(0) / UQ applied (uq) / UQ -> Optimised (f)
+
+	!
+	! Calculation classification
+	!
+		* Uncertainty type : A, B, X
+		* Gtol             : ?
+		* Basis set        : ?
+
+	!
+	! Python objects
+	!
+		* cluster<class:object>
+
+		bx_cluster_0 / bx_cluster_uq / bx_cluster_final: cluster object BX (PbI6)x8: cluster<object> list
+
+			Full merged single cluster objects: fbx_cluster_0 / fbx_cluster_uq / fbx_cluster_final: cluster<object>
+
+		ax_cluster_0 / ax_cluster_uq / ax_cluster_final: cluster object AX (CsI12)x8 cluster<object> list
+
+			Full merged single cluster objects: fax_cluster_0 / fax_cluster_uq / fax_cluster_final: cluster<object>
+
+	!
+	! Quantitative metric
+	!
+
+		* Δd : 0, uq, f
+		  applicable?: [AX],[BX]
+
+			ax_cluster_0_dd / ax_cluster_uq_dd / ax_cluster_final_dd: list<float:len(8)> ! measured for (CsI12) x 8, for each 'Cs'
+			bx_cluster_0_dd / bx_cluster_uq_dd / bx_cluster_final_dd: list<float:len(8)> ! measured for (PbI6)  x 8, for each 'Pb'
+
+
+		* β angles, B-X-B : 0, uq, f
+		  applicable?: [BX]
+
+			beta_x0 , beta_y0 , beta_z0    : list<float:len(4)>, list<float:len(4)>, list<float:len(4) -> for 'x', 'y', 'z' directions
+			beta_xuq, beta_yuq, beta_zuq
+			beta_xf , beta_yf , beta_zf
+
+		* lattice vectors : 0, uq, f
+		  applicable?: [Cell]
+
+			list<list<float:len(3)>:len(3)> : 
+
+			[[ a1 a2 a3 ],
+			 [ b1 b2 b3 ],
+			 [ c1 c2 c3 ]]
+
+			lvectors_0, lvectors_uq, lvectors_final
+
+		* lattice constants : 0, uq, f
+
+			list<float:len(3)> : [ a, b, c ]
+
+			lconstants_0, lconstants_uq, lconstants_final
+
+		* lattice angles : 0, uq, f
+
+			list<float:len(3)> : [ α, β, γ ]
+
+			langles_0, langles_uq, langles_final
+
+		* volume : 0, uq, f
+
+			float
+
+			lvolume_0, lvolume_uq, lvolume_final
+
+		----- 21.05.2024 (Tue)
+
+		# HOW TO DEAL WITH THE FOLLOWINGS?
+		elemlist, p_input_uq0_dr, p_input_uq0_sign, p_input_uq0_rmsd = calculate_deltaR(cell_uq,cell_0,elem=True)
+		print(f' * TESTING Cell uq - Cell 0 : delta_r')
+		print_delta_r(p_input_uq0_dr,elemlist=elemlist)
+		print(f' * ctd ... show sign table') # sign table -> -1/+1 binary !!
+		print_delta_r_sign(p_input_uq0_sign,elemlist=elemlist)
+'''
+
+
+
+
+
 
 
