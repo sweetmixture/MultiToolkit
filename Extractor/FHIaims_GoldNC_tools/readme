@@ -1,6 +1,52 @@
 #
-# 06.05 2024 WKJEE
+#	UV-VIS calculator using FHIaims-cube files
+#
+#	* using dipole transition rule
+#
+#	06.05 2024 WKJEE
 #
 
+	1. mos_analyser_2.py : dumping selected states (+-8 from HOMO spin up/down) json files
 
-mos_analyser_2.py : dumping selected states (+-8 from HOMO spin up/down) json files
+		* writing KS vectors for the following states
+
+			Au_sp: Au atom 'sp'
+			Au_d : Au atom 'd'
+			S_p  : S  atom 'p'
+			O    : Others
+
+			and save them in '.json' format: see 'selected_up/down.json'
+
+		* deprecated scripts:
+			mos_analyser.py
+			mos_analyser_orbitals.py
+
+	2. Transition.py
+		
+		* has dependency on 'ase.io.cube' module
+
+		taking two inputs, possibly before/after transitions (FHIaims generated cubefiles)
+
+		calculating transition intensity using transition dipolemoment
+
+		(note that unit is not specifically adjusted) ... 06.06.2024
+
+		* under '__main__' to see how this script is used
+
+		see:/work/e05/e05/wkjee/Gold/cubes1/cubes on ARCHER2
+
+	3. get_transitions_data.py
+
+		* batch processing of 'Transition.py'
+
+		to run this script, (1) generated 'selected_up/down.json' is required with 'cube'(dict_key) give path to cube files
+
+		example 'selected_up/down.json' files are at:
+
+			/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/FHIaims_GoldNC_tools/updown_cube
+			/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/FHIaims_GoldNC_tools/updown_cube_local
+
+		on ARCHER2
+
+		! make sure that the path are in match with the desired path of the cube files.
+		! also double check, if cubefiles are with corresponding KS eigen states

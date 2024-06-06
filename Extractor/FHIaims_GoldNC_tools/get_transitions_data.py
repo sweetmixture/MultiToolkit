@@ -39,7 +39,7 @@ down_lumo = {}
 
 # set upspin homo/lumo
 for key in upjson.keys():
-	if int(key) <= _upspin_homo:
+	if int(key) <= _upspin_homo:	# if 'key' is same or less than homo_state_number 
 		#up_homo[int(key)-_upspin_homo] = upjson[key]
 		up_homo[key] = upjson[key]
 	else:

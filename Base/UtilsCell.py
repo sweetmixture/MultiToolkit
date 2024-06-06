@@ -483,7 +483,7 @@ def cluster_dump_excessX(clusters, max_X_count):
 #
 #	A. Delta D calculator : 'clusters' -> 8 Oh clusters list
 #
-def calculate_delta_d(clusters,C='',S=''):
+def calculate_delta_d(clusters,bond_cnt=6.,C='',S=''):
 	
 	# delta_d list
 	ddlist = []
@@ -506,7 +506,7 @@ def calculate_delta_d(clusters,C='',S=''):
 
 		for d in dlist:
 			delta_d = delta_d + (d - dave)*(d - dave) / dave / dave
-		delta_d = delta_d/6.
+		delta_d = delta_d/float(bond_cnt)
 
 		ddlist.append(delta_d)
 

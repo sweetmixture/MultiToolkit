@@ -20,6 +20,21 @@
 			mos.py
 '''
 
+'''
+	Description
+
+	[a] require argument for spin-polarisation calculation: "-spin"
+
+		e.g., python this_python_script.py -spin
+
+	[b] for target analysis must specify which are the number for "HOMO" and "LUMO"
+
+		go to line number --> 320/321 for up/down
+
+	[c] for selecting number of states want to extract set min/max values (i.e., selecting +- how many HOMO(-?) and LUMO(+?)
+
+		go to line number --> 411/412
+'''
 
 import os,sys,json
 import numpy as np
