@@ -44,6 +44,8 @@ with open(upfile_list,'r') as f:
 		for key in upjson.keys():
 			if key == state:
 				upjson[key]['cube'] = filepath
+				print(state,upjson[key])
+print('')
 # liking 'cube' file to downjson
 with open(downfile_list,'r') as f:
 	next(f) # skip fisrt line
@@ -54,6 +56,8 @@ with open(downfile_list,'r') as f:
 		for key in downjson.keys():
 			if key == state:
 				downjson[key]['cube'] = filepath
+				print(state,downjson[key])
+print('')
 #
 # parsing json : LUMOs / HOMOs
 #
@@ -115,7 +119,7 @@ for istate in up_homo.keys():
 
 		il = int(istate)
 		fl = int(fstate)
-		print(f'{il:6d}{fl:6d}',end='')
+		# print(f'{il:6d}{fl:6d}',end='')
 		#
 		# get transition intensity
 		#
@@ -127,6 +131,7 @@ for istate in up_homo.keys():
 		
 			# get_trans_int(icube,fcube,verbose=False):
 			transI = get_trans_int(icube_file,fcube_file,verbose=False)
+			print(f'{il:6d}{fl:6d}',end='')
 			uptransI.append(transI)
 			#print(f'{il:6d}{fl:6d}{transE:16.8f}{transI:16.8f}')			
 			print(f'{transE:16.8f}{transI:16.8f}')			
@@ -153,7 +158,7 @@ for istate in down_homo.keys():
 
 		il = int(istate)
 		fl = int(fstate)
-		print(f'{il:6d}{fl:6d}',end='')
+		# print(f'{il:6d}{fl:6d}',end='')
 		#
 		# get transition intensity
 		#
@@ -165,6 +170,7 @@ for istate in down_homo.keys():
 		
 			# get_trans_int(icube,fcube,verbose=False):
 			transI = get_trans_int(icube_file,fcube_file,verbose=False)
+			print(f'{il:6d}{fl:6d}',end='')
 			downtransI.append(transI)
 			#print(f'{il:6d}{fl:6d}{transE:16.8f}{transI:16.8f}')			
 			print(f'{transE:16.8f}{transI:16.8f}')			

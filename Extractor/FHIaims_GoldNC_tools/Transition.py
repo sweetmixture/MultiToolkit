@@ -47,6 +47,10 @@ def get_trans_int(icube,fcube,verbose=False):
 
 	for nx in range(nx_max):
 	#for nx in tqdm(range(nx_max), desc='Integral progress'):
+
+		if nx%20 == 0:
+			print(f'{nx:4d}',end='',flush=True)
+
 		for ny in range(ny_max):
 			for nz in range(nz_max):
 				# get grid - or spatial position 'r' vector or (x,y,z)

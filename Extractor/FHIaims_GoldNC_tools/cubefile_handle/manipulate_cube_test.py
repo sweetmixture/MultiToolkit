@@ -32,8 +32,8 @@ nx_max = grid[0]
 ny_max = grid[1]
 nz_max = grid[2]
 
-print(f' * grid info')
-#print(grid,type(grid))
+print(f' * grid info (shape)')
+print(grid,type(grid))
 print(nx_max,ny_max,nz_max)
 print(f' * origin info (Å)')
 print(origin)
