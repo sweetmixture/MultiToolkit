@@ -3,7 +3,7 @@ from ase.io.cube import read_cube, write_cube
 # from ase.io.cube import read_cube_data
 
 # Path to the Gaussian cube file
-_cubefile = '/work/e05/e05/wkjee/Gold/cubes1/cubes/spin_down_0_HOMO.cube'
+_cubefile = '/work/e05/e05/wkjee/Gold/nosoc_cube_estate/pbe0/spin_down_0_HOMO.cube'
 
 #
 # Open the cube file and read it using read_cube function

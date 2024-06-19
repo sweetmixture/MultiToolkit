@@ -5,6 +5,7 @@ data = [
     {'eval': 1, 'elem': [9, 2, 3, 4, 5]},
     {'eval': 0, 'elem': [9, 2, 3, 4, 5]}
 ]
+print(data)
 
 sorted_data = sorted(data, key=lambda x: x['eval'])
 

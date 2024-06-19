@@ -29,32 +29,6 @@ with open(_downjson_file,'r') as log_file:
     print(f' loading ... {_downjson_file}')
     downjson = json.load(log_file)
 #
-# setting cube files
-#
-upfile_list   = 'up_cubelist.dat'
-downfile_list = 'down_cubelist.dat'
-
-# liking 'cube' file to upjson
-with open(upfile_list,'r') as f:
-	next(f) # skip fisrt line
-	for line in f:
-		ls = line.split()
-		state = ls[0]
-		filepath = ls[1]
-		for key in upjson.keys():
-			if key == state:
-				upjson[key]['cube'] = filepath
-# liking 'cube' file to downjson
-with open(downfile_list,'r') as f:
-	next(f) # skip fisrt line
-	for line in f:
-		ls = line.split()
-		state = ls[0]
-		filepath = ls[1]
-		for key in downjson.keys():
-			if key == state:
-				downjson[key]['cube'] = filepath
-#
 # parsing json : LUMOs / HOMOs
 #
 up_homo = {}

@@ -23,7 +23,7 @@
 '''
 	Description
 
-	[a] require argument for spin-polarisation calculation: "-spin"
+	[a] require argument for spin-polarisation calculation: "-spin", must correct '_root' variable !!!
 
 		e.g., python this_python_script.py -spin
 
