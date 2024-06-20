@@ -34,7 +34,7 @@ with open(_downjson_file,'r') as log_file:
 upfile_list   = 'up_cubelist.dat'
 downfile_list = 'down_cubelist.dat'
 
-# liking 'cube' file to upjson
+# linking 'cube' file to upjson
 with open(upfile_list,'r') as f:
 	next(f) # skip fisrt line
 	for line in f:
@@ -46,7 +46,7 @@ with open(upfile_list,'r') as f:
 				upjson[key]['cube'] = filepath
 				print(state,upjson[key])
 print('')
-# liking 'cube' file to downjson
+# linking 'cube' file to downjson
 with open(downfile_list,'r') as f:
 	next(f) # skip fisrt line
 	for line in f:
@@ -140,45 +140,46 @@ for istate in up_homo.keys():
 		except:
 			print(' Error, json does not have key : cube')
 			sys.exit()
-
-print(f' * ----------------------------------------')
-print(f' ! start down-spin transitions')	
-print(f' ! homo_state_i  lumo_state_f  deltaE  transI')
-print(f' * ----------------------------------------')
-#
-# down-spin
-downtranslist = []
-downtransI = []
-for istate in down_homo.keys():
-	istate_eval = down_homo[istate]['eval']
-
-	for fstate in down_lumo.keys():
-		fstate_eval = down_lumo[fstate]['eval']
-		transE = fstate_eval - istate_eval
-		downtranslist.append(transE)
-
-		il = int(istate)
-		fl = int(fstate)
-		# print(f'{il:6d}{fl:6d}',end='')
-		#
-		# get transition intensity
-		#
-
-		# get cube files
-		try:
-			icube_file = down_homo[istate]['cube']
-			fcube_file = down_lumo[fstate]['cube']
-		
-			# get_trans_int(icube,fcube,verbose=False):
-			transI = get_trans_int(icube_file,fcube_file,verbose=False)
-			print(f'{il:6d}{fl:6d}',end='')
-			downtransI.append(transI)
-			#print(f'{il:6d}{fl:6d}{transE:16.8f}{transI:16.8f}')			
-			#print(f'{transE:16.8f}{transI:16.8f}')			
-			print(f'{transE:16.8f}{transI:40.12e}')
-
-		except:
-			print(' Error, json does not have key : cube')
-			sys.exit()
-
 sys.exit()
+
+#print(f' * ----------------------------------------')
+#print(f' ! start down-spin transitions')	
+#print(f' ! homo_state_i  lumo_state_f  deltaE  transI')
+#print(f' * ----------------------------------------')
+##
+## down-spin
+#downtranslist = []
+#downtransI = []
+#for istate in down_homo.keys():
+#	istate_eval = down_homo[istate]['eval']
+#
+#	for fstate in down_lumo.keys():
+#		fstate_eval = down_lumo[fstate]['eval']
+#		transE = fstate_eval - istate_eval
+#		downtranslist.append(transE)
+#
+#		il = int(istate)
+#		fl = int(fstate)
+#		# print(f'{il:6d}{fl:6d}',end='')
+#		#
+#		# get transition intensity
+#		#
+#
+#		# get cube files
+#		try:
+#			icube_file = down_homo[istate]['cube']
+#			fcube_file = down_lumo[fstate]['cube']
+#		
+#			# get_trans_int(icube,fcube,verbose=False):
+#			transI = get_trans_int(icube_file,fcube_file,verbose=False)
+#			print(f'{il:6d}{fl:6d}',end='')
+#			downtransI.append(transI)
+#			#print(f'{il:6d}{fl:6d}{transE:16.8f}{transI:16.8f}')			
+#			#print(f'{transE:16.8f}{transI:16.8f}')			
+#			print(f'{transE:16.8f}{transI:40.12e}')
+#
+#		except:
+#			print(' Error, json does not have key : cube')
+#			sys.exit()
+#
+#sys.exit()
