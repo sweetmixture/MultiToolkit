@@ -96,66 +96,26 @@ print(down_homo.keys())
 print(f' ! LUMO keys')
 print(down_lumo.keys())
 
-#print(f' * ----------------------------------------')
-#print(f' ! start up-spin transitions')	
-#print(f' ! homo_state_i  lumo_state_f  deltaE  transI')
-#print(f' * ----------------------------------------')
-##
-## up-spin
-#uptranslist = []
-#uptransI = []
-##
-## printing items: istate fstate exciteE transI
-##
-## transI : transition dipole (NOT 'oscillator strength')
-##
-#for istate in up_homo.keys():
-#	istate_eval = up_homo[istate]['eval']
-#
-#	for fstate in up_lumo.keys():
-#		fstate_eval = up_lumo[fstate]['eval']
-#		transE = fstate_eval - istate_eval
-#		uptranslist.append(transE)
-#
-#		il = int(istate)
-#		fl = int(fstate)
-#		# print(f'{il:6d}{fl:6d}',end='')
-#		#
-#		# get transition intensity
-#		#
-#		
-#		# get cube files
-#		try:
-#			icube_file = up_homo[istate]['cube']
-#			fcube_file = up_lumo[fstate]['cube']
-#		
-#			# get_trans_int(icube,fcube,verbose=False):
-#			transI = get_trans_int(icube_file,fcube_file,verbose=False)
-#			print(f'{il:6d}{fl:6d}',end='')
-#			uptransI.append(transI)
-#			#print(f'{il:6d}{fl:6d}{transE:16.8f}{transI:16.8f}')			
-#			#print(f'{transE:16.8f}{transI:16.8f}')			
-#			print(f'{transE:16.8f}{transI:40.12e}')
-#
-#		except:
-#			print(' Error, json does not have key : cube')
-#			sys.exit()
-
 print(f' * ----------------------------------------')
-print(f' ! start down-spin transitions')	
+print(f' ! start up-spin transitions')	
 print(f' ! homo_state_i  lumo_state_f  deltaE  transI')
 print(f' * ----------------------------------------')
 #
-# down-spin
-downtranslist = []
-downtransI = []
-for istate in down_homo.keys():
-	istate_eval = down_homo[istate]['eval']
+# up-spin
+uptranslist = []
+uptransI = []
+#
+# printing items: istate fstate exciteE transI
+#
+# transI : transition dipole (NOT 'oscillator strength')
+#
+for istate in up_homo.keys():
+	istate_eval = up_homo[istate]['eval']
 
-	for fstate in down_lumo.keys():
-		fstate_eval = down_lumo[fstate]['eval']
+	for fstate in up_lumo.keys():
+		fstate_eval = up_lumo[fstate]['eval']
 		transE = fstate_eval - istate_eval
-		downtranslist.append(transE)
+		uptranslist.append(transE)
 
 		il = int(istate)
 		fl = int(fstate)
@@ -163,22 +123,65 @@ for istate in down_homo.keys():
 		#
 		# get transition intensity
 		#
-
+		
 		# get cube files
 		try:
-			icube_file = down_homo[istate]['cube']
-			fcube_file = down_lumo[fstate]['cube']
+			icube_file = up_homo[istate]['cube']
+			fcube_file = up_lumo[fstate]['cube']
 		
 			# get_trans_int(icube,fcube,verbose=False):
 			transI = get_trans_int(icube_file,fcube_file,verbose=False)
 			print(f'{il:6d}{fl:6d}',end='')
-			downtransI.append(transI)
+			uptransI.append(transI)
 			#print(f'{il:6d}{fl:6d}{transE:16.8f}{transI:16.8f}')			
 			#print(f'{transE:16.8f}{transI:16.8f}')			
 			print(f'{transE:16.8f}{transI:40.12e}')
 
 		except:
+			print(f'{il:6d}{fl:6d} : ',end='')
 			print(' Error, json does not have key : cube')
+			pass
 			sys.exit()
-
 sys.exit()
+
+#print(f' * ----------------------------------------')
+#print(f' ! start down-spin transitions')	
+#print(f' ! homo_state_i  lumo_state_f  deltaE  transI')
+#print(f' * ----------------------------------------')
+##
+## down-spin
+#downtranslist = []
+#downtransI = []
+#for istate in down_homo.keys():
+#	istate_eval = down_homo[istate]['eval']
+#
+#	for fstate in down_lumo.keys():
+#		fstate_eval = down_lumo[fstate]['eval']
+#		transE = fstate_eval - istate_eval
+#		downtranslist.append(transE)
+#
+#		il = int(istate)
+#		fl = int(fstate)
+#		# print(f'{il:6d}{fl:6d}',end='')
+#		#
+#		# get transition intensity
+#		#
+#
+#		# get cube files
+#		try:
+#			icube_file = down_homo[istate]['cube']
+#			fcube_file = down_lumo[fstate]['cube']
+#		
+#			# get_trans_int(icube,fcube,verbose=False):
+#			transI = get_trans_int(icube_file,fcube_file,verbose=False)
+#			print(f'{il:6d}{fl:6d}',end='')
+#			downtransI.append(transI)
+#			#print(f'{il:6d}{fl:6d}{transE:16.8f}{transI:16.8f}')			
+#			#print(f'{transE:16.8f}{transI:16.8f}')			
+#			print(f'{transE:16.8f}{transI:40.12e}')
+#
+#		except:
+#			print(' Error, json does not have key : cube')
+#			sys.exit()
+#
+#sys.exit()
