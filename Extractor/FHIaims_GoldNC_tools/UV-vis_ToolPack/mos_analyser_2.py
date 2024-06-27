@@ -73,9 +73,10 @@ try:
 except:
 	pass
 #
-# root
+# root : user must set this
 #
-_root = '/work/e05/e05/wkjee/Gold/nosoc_cube_estate/pbe0'
+_root = ''
+# example # _root = '/work/e05/e05/wkjee/Gold/nosoc_cube_estate/pbe0'
 
 if _lspin == True:
 

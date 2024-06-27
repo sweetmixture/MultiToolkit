@@ -37,6 +37,8 @@
 		# N.B. this script is specifically written for Au25(SR)18 application,
 		# for different application, this script must be modified.
 
+		# * * * USER MUST SET DESIRED ROOT WHERE THIS SCRIPT IS GOING TO TAKE FHIAIMS DATA !!!
+
 		! Execution of this script will create: 'selected_up.json' and 'selected_down.json' files,
 		including: eigenvalues (eval) and orbital occupancies (occ).
 
