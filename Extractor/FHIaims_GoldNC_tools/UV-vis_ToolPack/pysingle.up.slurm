@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --job-name=pbefup
+#SBATCH --job-name=Gb3lFU
 #SBATCH --time=24:00:00
 #SBATCH --ntasks=1
 
@@ -28,13 +28,13 @@ echo ' | shell loading py env - done'
 #
 #python mos_analyser_2.py -spin 1> mos_analyser_2.out 2> mos_analyser_2.err
 
-#echo ' | start up channel'
-#python get_transitions_data_up.py   1> simpleUV.up.out 2> simpleUV.up.err
-#echo ' | up channel processing done'
+echo ' | start up channel'
+python get_transitions_data_up.py   1> simpleUV.up.out 2> simpleUV.up.err
+echo ' | up channel processing done'
 
-echo ' | start dn channel'
-python get_transitions_data_down.py 1> simpleUV.dn.out 2> simpleUV.dn.err
-echo ' | dn channel processing done'
+#echo ' | start dn channel'
+#python get_transitions_data_down.py 1> simpleUV.dn.out 2> simpleUV.dn.err
+#echo ' | dn channel processing done'
 
 #get_transitions_data_up.py
 #get_transitions_data_down.py

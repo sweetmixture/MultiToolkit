@@ -66,6 +66,8 @@
 		 9  1556      spin_up_0_LUMO.cube
 		 ...
 
+		run this script on serial queue, use: 'pysingle.dn.slurm  pysingle.slurm  pysingle.up.slurm'
+
 	(4) add_soc.py
 
 		! Execution of this script will create: 'soc_simpleUV.up/dn.out': these files are similar to 'simpleUV.up/dn.out' from (3)

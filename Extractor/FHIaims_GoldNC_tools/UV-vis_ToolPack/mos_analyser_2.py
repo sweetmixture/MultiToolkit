@@ -75,7 +75,8 @@ except:
 #
 # root : user must set this
 #
-_root = ''
+#_root = ''
+_root = os.getcwd()
 # example # _root = '/work/e05/e05/wkjee/Gold/nosoc_cube_estate/pbe0'
 
 if _lspin == True:

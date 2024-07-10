@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --job-name=pbefup
+#SBATCH --job-name=Gb3lFD
 #SBATCH --time=24:00:00
 #SBATCH --ntasks=1
 
