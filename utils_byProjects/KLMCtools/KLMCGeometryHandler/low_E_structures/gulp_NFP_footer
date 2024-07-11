@@ -1,0 +1,42 @@
+species
+Li core +1
+Na core +1
+Mn core +2
+Fe core +3
+P  core +4.9708
+O  core +0.9015
+O  shel -2.8942
+buck
+Li core O  shel 381.5244 0.30491 0. 0. 24.
+buck
+Na core O  shel  926.840 0.30650  0.00000 0.0 10.0
+buck
+Mn core O  shel 13207.008 0.22245 0. 0. 24.
+buck
+Fe core O  shel 2111.9671 0.28941 0. 0. 24.
+buck
+P  core O  shel 1028.9741 0.33530 0. 0. 24.
+buck
+O  shel O  shel 39.7594 0.47713 53.204 0. 24.
+
+#lenn 12 6
+#O shel Mn core 1000. 0. 0. 6.
+#lenn 12 6
+#O shel Fe core 1000. 0. 0. 6.
+#lenn 12 6
+#O shel Na core 1000. 0. 0. 6.
+#lenn 12 6
+#O shel P  core 1000. 0. 0. 6.
+
+spring
+O      67.3564     #1000.0000
+accuracy 20.000  4 50  8.000
+xtol opt   8.000000
+gtol opt   10.000000
+ftol opt   8.000000
+maxcyc opt  1000
+switch rfo 0.05
+switch_min rfo   gnorm     0.010
+stepmx 0.05
+dump every     10 gulp.res
+output cif cryst.cif
