@@ -14,7 +14,7 @@
             GULP.py     : GULP_Patterns, ExtractGULP
             FHIaims.py  : FHIaims_Patterns, ExtractFHIaims
 
-          *  GULPstruct.py
+          *  GULPstruct.py : this is for post-processing GULP structure
 
     19.09.2023  : framework
 

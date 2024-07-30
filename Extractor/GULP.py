@@ -21,6 +21,15 @@ import os
 import numpy as np
 
 from Base.Cells import Cell
+#
+# True/False <-- isnumber(token<str>)
+#
+def is_number(s):
+	try:
+		float(s)
+		return True
+	except ValueError:
+		return False
 
 class GULP_Patterns(object):
 
@@ -34,16 +43,31 @@ class GULP_Patterns(object):
 			'JobDone'       : { 'space' : 0, 'next' : 0, 'loc' : 0, 'pattern' : 'Job Finished at' },
 		}
 
+		# for Input
 		self.InputConfig = {
 			'From'			: { 'space' : 0, 'next' : 0, 'loc' : 0, 'pattern' : 'Input for Configuration' },
 			'IrAtomsShells' : { 'space' : 0, 'next' : 0, 'loc' : 6, 'pattern' : 'Number of irreducible atoms/shells =' },
 			'AtomsShells'   : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Total number atoms/shells =' },
 			'Dimension'     : { 'space' : 0, 'next' : 0, 'loc' : 3, 'pattern' : 'Dimensionality =' },
+
+			'InitEnergy'    : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Total lattice energy' },										
+			'InitFrac'      : { 'space' : 5, 'next' : 0, 'loc' : 0, 'pattern' : 'Fractional coordinates of'},
 			'LattVectors'   : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Cartesian lattice vectors (Angstroms) :' },
 			'LattParams'    : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Cell parameters (Angstroms/Degrees):' },
 			'LattVol'       : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Initial cell volume =' },
-		}
 
+			# Init Energy Decomposition
+			'InitEnergyIP'         : { 'space' : 0, 'next' : 0, 'loc' : 4, 'pattern' : 'Interatomic potentials     ='},
+			'InitEnergyElecRe'     : { 'space' : 0, 'next' : 0, 'loc' : 6, 'pattern' : 'Monopole - monopole (real) ='},
+			'InitEnergyElecIm'     : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Monopole - monopole (recip)='},
+			'InitEnergyElec'       : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Monopole - monopole (total)='},
+		}
+		#
+		#	Note. 'space' tells how many lines for skipping to get actual information
+		#	      'next'  expected length of the string if: len(line.split())
+		#	      'loc'   index where the information is: line.split()[loc]
+
+		# for output
 		self.OutputConfig = {
 			'From'          : { 'space' : 0, 'next' : 0, 'loc' : 0, 'pattern' : 'Output for configuration' },
 			'InitEnergy'    : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Total lattice energy' },										
@@ -53,6 +77,12 @@ class GULP_Patterns(object):
 			'LattVectors'   : { 'space' : 1, 'next' : 3, 'loc' : 0, 'pattern' : 'Final Cartesian lattice vectors (Angstroms) :' },
 			'LattParams'    : { 'space' : 2, 'next' : 6, 'loc' : 0, 'pattern' : 'Final cell parameters and derivatives :' },
 			'LattVol'       : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Non-primitive cell volume =' },
+
+			# Final Energy Decomposition
+			'FinalEnergyIP'         : { 'space' : 0, 'next' : 0, 'loc' : 4, 'pattern' : 'Interatomic potentials     ='},
+			'FinalEnergyElecRe'     : { 'space' : 0, 'next' : 0, 'loc' : 6, 'pattern' : 'Monopole - monopole (real) ='},
+			'FinalEnergyElecIm'     : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Monopole - monopole (recip)='},
+			'FinalEnergyElec'       : { 'space' : 0, 'next' : 0, 'loc' : 5, 'pattern' : 'Monopole - monopole (total)='},
 		}
 		'''
 			need keyword check / dimension check
@@ -134,6 +164,171 @@ class ExtractGULP(GULP_Patterns):
 		Output Convention : [ True/False , Return <method dependent format> ]
 	'''
 	# --------------------------------------------------------------------------------------------------------------------
+	def get_initial_energy(self):
+
+		if False in self.check_status():
+			return False, None
+
+		for line in self.output_file_ptr:
+			if self.InputConfig['InitEnergy']['pattern'] in line:
+				energy = float(line.strip().split()[self.OutputConfig['InitEnergy']['loc']-1])
+				self.output_file_ptr.seek(0)
+				return True, energy
+
+		# end for
+		self.output_file_ptr.seek(0)
+		return False, None
+
+	def get_initial_energy_full(self):
+
+		energy_list = []
+
+		if False in self.check_status():
+			return False, None
+
+		for line in self.output_file_ptr:
+			if self.InputConfig['InitEnergyIP']['pattern'] in line:
+				energy = float(line.strip().split()[self.InputConfig['InitEnergyIP']['loc']-1])
+				#self.output_file_ptr.seek(0)
+				break
+
+		energy_list.append(energy) # update (1) IP
+
+		for line in self.output_file_ptr:
+			if self.InputConfig['InitEnergyElecRe']['pattern'] in line:
+				energy = float(line.strip().split()[self.InputConfig['InitEnergyElecRe']['loc']-1])
+				#self.output_file_ptr.seek(0)
+				break
+
+		energy_list.append(energy) # update (2) Ewald Real
+
+		for line in self.output_file_ptr:
+			if self.InputConfig['InitEnergyElecIm']['pattern'] in line:
+				energy = float(line.strip().split()[self.InputConfig['InitEnergyElecIm']['loc']-1])
+				#self.output_file_ptr.seek(0)
+				break
+
+		energy_list.append(energy) # update (3) Ewald Imag
+
+		for line in self.output_file_ptr:
+			if self.InputConfig['InitEnergyElec']['pattern'] in line:
+				energy = float(line.strip().split()[self.InputConfig['InitEnergyElec']['loc']-1])
+				self.output_file_ptr.seek(0)
+
+				energy_list.append(energy)
+				# if_success : return here
+				return True, energy_list
+
+		# end for
+		self.output_file_ptr.seek(0)
+		return False, None
+
+	# --------------------------------------------------------------------------------------------------------------------
+
+	def get_initial_frac(self):
+		NotImplemented
+
+	# --------------------------------------------------------------------------------------------------------------------
+	def get_initial_frac_cosh(self):	# get core-shell (cosh)
+		
+		#
+		# check if gulp run status: check_status()<list[2]> : updated by 'ExtractGULP.check_finish_normal()'
+		#
+		if False in self.check_status():
+			return False, None
+		
+		pattern = False
+		atomlist = []
+
+		for line in self.output_file_ptr:
+			if self.InputConfig['InitFrac']['pattern'] in line:
+				pattern = True
+				break
+		
+		if pattern:
+
+			iterator = iter(self.output_file_ptr)
+
+			#
+			# skipping 'self.InputConfig['InitFrac']['space']' number of lines
+			#
+			for i in range(self.InputConfig['InitFrac']['space']):
+				next(iterator)
+
+			while True:
+
+				strings = next(iterator).split()
+
+				if len(strings) < 7:
+				# e.g., string will be like '1  Tc    c     0.717584    0.345205    0.421269    0.000000' --> 7 letters
+					break
+
+				# strings[1] reserved for species
+				atype = None
+				if strings[2] == 'c':
+					atype = 'core'
+				if strings[2] == 's':
+					atype = 'shel'
+				# get frac
+				frac = []
+				for token in strings:
+
+					if is_number(token):
+						frac.append(float(token))
+					# check
+					#print(frac,token,token.isdigit(),token.isnumeric(),token.isdecimal(),is_number(token))
+					if len(frac) == 4:
+						break
+				atom = [ strings[1], atype, frac[1], frac[2], frac[3] ]
+				atomlist.append(atom)
+
+			self.output_file_ptr.seek(0)
+			return True, atomlist
+
+		else: 
+			self.output_file_ptr.seek(0)
+			return False, None
+
+	# --------------------------------------------------------------------------------------------------------------------
+	def get_initial_lvectors(self):
+
+		if False in self.check_status():
+			return False, None
+
+		pattern = False
+		lvectors = []
+
+		for line in self.output_file_ptr:
+			if self.InputConfig['LattVectors']['pattern'] in line:
+				pattern = True
+				break
+
+		if pattern:
+
+			iterator = iter(self.output_file_ptr)
+			next(iterator)
+
+			lvectors.append(next(iterator).split())	
+			lvectors.append(next(iterator).split())	
+			lvectors.append(next(iterator).split())	
+
+			for i in range(3):
+				for j in range(3):
+					lvectors[i][j] = float(lvectors[i][j])
+
+			self.output_file_ptr.seek(0)
+			return True, lvectors
+
+		else:
+			self.output_file_ptr.seek(0)
+			return False, None
+
+	# --------------------------------------------------------------------------------------------------------------------
+	def get_initial_lparams(self):
+		NotImplemented
+	def get_initial_lvolume(self):
+		NotImplemented
+	# --------------------------------------------------------------------------------------------------------------------
 	def get_final_energy(self):
 
 		if False in self.check_status():
@@ -149,6 +344,57 @@ class ExtractGULP(GULP_Patterns):
 		self.output_file_ptr.seek(0)
 		return False, None
 
+	#
+	#	For getting lattice energy : (1) IP (2) Elec-Re (3) Elec-Im (4) Elec
+	#
+	def get_final_energy_full(self):
+
+		energy_list = []
+
+		if False in self.check_status():
+			return False, None
+
+		#	First, get to the end of optimisation
+		for line in self.output_file_ptr:
+			if self.OutputConfig['FinalEnergyIP']['pattern'] in line:
+				break
+
+		for line in self.output_file_ptr:
+			if self.OutputConfig['FinalEnergyIP']['pattern'] in line:
+				energy = float(line.strip().split()[self.OutputConfig['FinalEnergyIP']['loc']-1])
+				#self.output_file_ptr.seek(0)
+				break
+
+		energy_list.append(energy) # update (1) IP
+
+		for line in self.output_file_ptr:
+			if self.OutputConfig['FinalEnergyElecRe']['pattern'] in line:
+				energy = float(line.strip().split()[self.OutputConfig['FinalEnergyElecRe']['loc']-1])
+				#self.output_file_ptr.seek(0)
+				break
+
+		energy_list.append(energy) # update (2) Ewald Real
+
+		for line in self.output_file_ptr:
+			if self.OutputConfig['FinalEnergyElecIm']['pattern'] in line:
+				energy = float(line.strip().split()[self.OutputConfig['FinalEnergyElecIm']['loc']-1])
+				#self.output_file_ptr.seek(0)
+				break
+
+		energy_list.append(energy) # update (3) Ewald Imag
+
+		for line in self.output_file_ptr:
+			if self.OutputConfig['FinalEnergyElec']['pattern'] in line:
+				energy = float(line.strip().split()[self.OutputConfig['FinalEnergyElec']['loc']-1])
+				self.output_file_ptr.seek(0)
+
+				energy_list.append(energy)
+				# if_success : return here
+				return True, energy_list
+
+		# end for
+		self.output_file_ptr.seek(0)
+		return False, None
 	# --------------------------------------------------------------------------------------------------------------------
 	def get_final_gnorm(self,gnorm_tol=None):
 
@@ -172,10 +418,12 @@ class ExtractGULP(GULP_Patterns):
 		# end for
 		self.output_file_ptr.seek(0)
 		return False, None
-
 	# --------------------------------------------------------------------------------------------------------------------
 	def get_final_frac(self):
 		
+		#
+		# check if gulp run status: check_status()<list[2]> : updated by 'ExtractGULP.check_finish_normal()'
+		#
 		if False in self.check_status():
 			return False, None
 		
@@ -191,6 +439,9 @@ class ExtractGULP(GULP_Patterns):
 
 			iterator = iter(self.output_file_ptr)
 
+			#
+			# skipping 'self.OutputConfig['FinalFrac']['space']' number of lines
+			#
 			for i in range(self.OutputConfig['FinalFrac']['space']):
 				next(iterator)
 
@@ -198,6 +449,7 @@ class ExtractGULP(GULP_Patterns):
 
 				strings = next(iterator).split()
 				if len(strings) < 7:
+				# e.g., string will be like '1  Tc    c     0.717584    0.345205    0.421269    0.000000' --> 7 letters
 					break
 				if strings[2] == 'c':		# if this is core
 					atom = [ strings[1], float(strings[3]), float(strings[4]), float(strings[5]) ]
@@ -209,7 +461,51 @@ class ExtractGULP(GULP_Patterns):
 		else: 
 			self.output_file_ptr.seek(0)
 			return False, None
+	def get_final_frac_cosh(self):
+		
+		#
+		# check if gulp run status: check_status()<list[2]> : updated by 'ExtractGULP.check_finish_normal()'
+		#
+		if False in self.check_status():
+			return False, None
+		
+		pattern = False
+		atomlist = []
 
+		for line in self.output_file_ptr:
+			if self.OutputConfig['FinalFrac']['pattern'] in line:
+				pattern = True
+				break
+		
+		if pattern:
+
+			iterator = iter(self.output_file_ptr)
+
+			#
+			# skipping 'self.OutputConfig['FinalFrac']['space']' number of lines
+			#
+			for i in range(self.OutputConfig['FinalFrac']['space']):
+				next(iterator)
+
+			while True:
+
+				strings = next(iterator).split()
+				if len(strings) < 7:
+				# e.g., string will be like '1  Tc    c     0.717584    0.345205    0.421269    0.000000' --> 7 letters
+					break
+				if strings[2] == 'c':		# if this is core
+					atom = [ strings[1], 'core', float(strings[3]), float(strings[4]), float(strings[5]) ]
+					atomlist.append(atom)
+				if strings[2] == 's':
+					atom = [ strings[1], 'shel', float(strings[3]), float(strings[4]), float(strings[5]) ]
+					atomlist.append(atom)
+
+			self.output_file_ptr.seek(0)
+			return True, atomlist
+
+		else: 
+			self.output_file_ptr.seek(0)
+			return False, None
 	# --------------------------------------------------------------------------------------------------------------------
 	def get_final_lvectors(self):
 
@@ -484,7 +780,8 @@ if __name__ == '__main__':
 
 	gex = ExtractGULP()
 
-	fcheck = gex.set_output_file('/home/uccawkj/MultiToolkit/Extractor/A13.gout')
+	#fcheck = gex.set_output_file('/home/uccawkj/MultiToolkit/Extractor/A13.gout') 	# YOUNG
+	fcheck = gex.set_output_file('/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/demo_gulp_files/A13.gout')
 
 	print(' ------ file 1')
 	if fcheck:
@@ -496,6 +793,31 @@ if __name__ == '__main__':
 		#print('final gnorm  :',gex.get_final_gnorm())
 	
 		print('final frac   :',gex.get_final_frac())
+		cslist = gex.get_final_frac_cosh()
+		print(f' * FINAL FRAC')
+		for atom in cslist[1]:
+			print(atom)
+
+		full_energy = gex.get_final_energy_full()
+		for energy in full_energy:
+			print(energy)
+
+		init_energy = gex.get_initial_energy()
+		print(init_energy)
+
+		full_init_energy = gex.get_initial_energy_full()
+		for energy in full_init_energy:
+			print(energy)
+
+
+		# get init frac
+		print(f' * INITIAL FRAC')
+		cslist_init = gex.get_initial_frac_cosh()
+		for atom in cslist_init[1]:
+			print(atom)
+
+		print(f' * initial lattice vectors', gex.get_initial_lvectors())
+
 		#print('final energy :',gex.get_final_energy())
 		#print('final gnorm  :',gex.get_final_gnorm(gnorm_tol=1.E-6))
 
@@ -512,7 +834,8 @@ if __name__ == '__main__':
 
 		gex.reset()
 
-	fcheck = gex.set_output_file('/home/uccawkj/MultiToolkit/Extractor/gulp.got')
+	#fcheck = gex.set_output_file('/home/uccawkj/MultiToolkit/Extractor/demo_gulp_files/gulp.got')
+	fcheck = gex.set_output_file('/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/demo_gulp_files/gulp.got')
 
 	print(' ------ file 2')
 	if fcheck:
