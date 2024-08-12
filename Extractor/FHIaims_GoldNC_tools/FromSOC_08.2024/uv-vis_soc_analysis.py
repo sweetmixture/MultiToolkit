@@ -367,7 +367,117 @@ for state in homo_states:
 # END ---
 
 
-
+'''
+	Possible Output:
+ * no normalisation ------------- 
+ 3101 <--- state
+ up_csqr :       1.009216456080
+ dn_csqr :       0.213503198625
+ csqr    :       1.222719654705
+ *    normalisation ------------- 
+ 3101 <--- state
+ up_csqr :       0.825386630694
+ dn_csqr :       0.174613369306
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.825387/     0.17461
+ * no normalisation ------------- 
+ 3102 <--- state
+ up_csqr :       0.252293226024
+ dn_csqr :       0.972459734120
+ csqr    :       1.224752960144
+ *    normalisation ------------- 
+ 3102 <--- state
+ up_csqr :       0.205995195957
+ dn_csqr :       0.794004804043
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.205995/     0.79400
+ * no normalisation ------------- 
+ 3103 <--- state
+ up_csqr :       1.077425346185
+ dn_csqr :       0.134325853585
+ csqr    :       1.211751199770
+ *    normalisation ------------- 
+ 3103 <--- state
+ up_csqr :       0.889147331886
+ dn_csqr :       0.110852668114
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.889147/     0.11085
+ * no normalisation ------------- 
+ 3104 <--- state
+ up_csqr :       0.152214199784
+ dn_csqr :       1.044762685421
+ csqr    :       1.196976885205
+ *    normalisation ------------- 
+ 3104 <--- state
+ up_csqr :       0.127165529815
+ dn_csqr :       0.872834470185
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.127166/     0.87283
+ * no normalisation ------------- 
+ 3105 <--- state
+ up_csqr :       0.949372813230
+ dn_csqr :       0.246060203231
+ csqr    :       1.195433016461
+ *    normalisation ------------- 
+ 3105 <--- state
+ up_csqr :       0.794166465337
+ dn_csqr :       0.205833534663
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.794166/     0.20583
+ * no normalisation ------------- 
+ 3106 <--- state
+ up_csqr :       0.207843333392
+ dn_csqr :       0.961935359056
+ csqr    :       1.169778692449
+ *    normalisation ------------- 
+ 3106 <--- state
+ up_csqr :       0.177677482702
+ dn_csqr :       0.822322517298
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.177677/     0.82232
+ * no normalisation ------------- 
+ 3107 <--- state
+ up_csqr :       1.086243571866
+ dn_csqr :       0.113808589051
+ csqr    :       1.200052160916
+ *    normalisation ------------- 
+ 3107 <--- state
+ up_csqr :       0.905163631418
+ dn_csqr :       0.094836368582
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.905164/     0.09484
+ * no normalisation ------------- 
+ 3108 <--- state
+ up_csqr :       0.036772109311
+ dn_csqr :       1.168368181318
+ csqr    :       1.205140290629
+ *    normalisation ------------- 
+ 3108 <--- state
+ up_csqr :       0.030512720881
+ dn_csqr :       0.969487279119
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.030513/     0.96949
+ * no normalisation ------------- 
+ 3109 <--- state
+ up_csqr :       1.193423566196
+ dn_csqr :       0.036636672967
+ csqr    :       1.230060239164
+ *    normalisation ------------- 
+ 3109 <--- state
+ up_csqr :       0.970215545710
+ dn_csqr :       0.029784454290
+ csqr    :       1.000000000000
+ * weight *
+ up/dn :     0.970216/     0.02978
+'''
 
 
 
