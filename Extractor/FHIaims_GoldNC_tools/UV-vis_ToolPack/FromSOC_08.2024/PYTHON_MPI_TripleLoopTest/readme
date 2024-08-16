@@ -1,0 +1,10 @@
+#
+#	08.2024 WKJEE for UV-vis post-procssing acceleration preparation
+#
+
+mpirun_cmd.slurm : using mpirun command on ARCHER2 login nodes available - permission blocked to do this on compute node
+srun_cmd.slurm   : must use srun --mpi=mpi2 python XXX command (ARCHER2 webpage guide is very misleading !!!)
+
+triple.py           : serial version
+triple_mpi.py       : mpi4py version
+triple_mpi_ptype.py : mpi4py python type test (numpy array)

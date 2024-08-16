@@ -3,7 +3,7 @@ from mpi4py import MPI
 import time
 
 grid = (267, 246, 236)
-grid = (2670, 246, 236)
+#grid = (2670, 246, 236)
 total_points = grid[0] * grid[1] * grid[2]
 #grid = (2, 3, 4)
 

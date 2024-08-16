@@ -1,16 +1,21 @@
 #!/bin/bash
 
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --job-name=mpipy-t
-#SBATCH --time=00:20:00
+#SBATCH --job-name=uv_b3mpi
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=128
+#SBATCH --ntasks-per-node=32
 #SBATCH --cpus-per-task=1
+
+# 1 node 128 - OOM (OUT OF MEMORY)
+# 1 node 64  - OK * best performance
+# 1 node 32  - OK
+# 4 node 32  - ?
 
 # Replace [budget code] below with your budget code (e.g. t01)
 #SBATCH --account=e05-react-smw
 #SBATCH --partition=standard
-#SBATCH --qos=short
+#SBATCH --qos=standard
 
 # Set the number of threads to 1
 #   This prevents any threaded system libraries from automatically 
@@ -37,7 +42,7 @@ export SRUN_CPUS_PER_TASK=${SLURM_CPUS_PER_TASK}
 #   Using 512 MPI processes and 128 MPI processes per node
 #   srun picks up the distribution from the sbatch options
 
-EXE="/work/e05/e05/wkjee/Software/MultiToolkit/Extractor/FHIaims_GoldNC_tools/UV-vis_ToolPack/FromSOC_08.2024/ThreadingRef/mpi4py"
+EXE=$PWD
 #    /work/e05/e05/wkjee/Gold/soc_cube_estate/soc_evec/b3lyp_ex_states
 echo ' | start dn channel'
 
@@ -48,7 +53,7 @@ echo ' | start dn channel'
 #srun python ${EXE}/triple_mpi.py 1> mpi_triple.out 2> mpi_triple.err
 #srun --mpi=pmix 
 
-srun --mpi=pmi2 python ${EXE}/triple_mpi.py 1> mpi_triple.out 2> mpi_triple.err
+srun --mpi=pmi2 python ${EXE}/uv-vis_soc_analysis_mpi.py 1> uv_mpipy.out 2> uv_mpipy.err
 
 echo ' | dn channel processing done'
 

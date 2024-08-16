@@ -1,0 +1,13 @@
+psize : 128
+elapsed time : 1.0804 s
+result : [2.06162662e+09 1.89886662e+09 1.82136186e+09], 5781855096.0
+task size : 15500952
+
+'''
+scalar type only - Python MPI
+
+psize : 32
+elapsed time : 0.2830 s
+result : 5781855096
+task size : 15500952
+'''
