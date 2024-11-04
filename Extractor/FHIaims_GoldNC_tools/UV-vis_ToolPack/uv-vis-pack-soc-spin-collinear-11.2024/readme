@@ -1,0 +1,7 @@
+#
+# 11.2024 WKJEE
+#
+
+ * required python modules:
+
+   ase, numpy, mpi4py
